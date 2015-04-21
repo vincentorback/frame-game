@@ -15,8 +15,8 @@ var requestAnimFrame = (function(){
 // Create the canvas
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
-canvas.width = 512;
-canvas.height = 480;
+canvas.width = 400;
+canvas.height = 400;
 document.body.appendChild(canvas);
 
 // The main game loop
@@ -53,7 +53,7 @@ resources.onReady(init);
 // Game state
 var player = {
     pos: [0, 0],
-    sprite: new Sprite('images/sprites.png', [0, 0], [24, 45], 12, [2, 3, 4, 5, 6, 7, 0, 1])
+    sprite: new Sprite('images/sprites.png', [0, 0], [24, 48], 12, [2, 3, 4, 5, 6, 7, 0, 1])
 };
 
 var bullets = [];
@@ -85,7 +85,7 @@ function update(dt) {
     if(Math.random() < 1 - Math.pow(.993, gameTime)) {
         enemies.push({
             pos: [canvas.width, Math.random() * (canvas.height - 39)],
-            sprite: new Sprite('images/sprites.png', [0, 48], [24, 45], 24, [2, 3, 4, 5, 6, 7, 0, 1])
+            sprite: new Sprite('images/sprites.png', [0, 49], [24, 48], 24, [1, 0, 7, 6, 5, 4, 3, 2])
         });
     }
 
@@ -119,13 +119,13 @@ function handleInput(dt) {
 
         bullets.push({ pos: [x, y],
                        dir: 'forward',
-                       sprite: new Sprite('images/sprites.png', [0, 39], [18, 8]) });
-        bullets.push({ pos: [x, y],
-                       dir: 'up',
-                       sprite: new Sprite('images/sprites.png', [0, 50], [9, 5]) });
-        bullets.push({ pos: [x, y],
-                       dir: 'down',
-                       sprite: new Sprite('images/sprites.png', [0, 60], [9, 5]) });
+                       sprite: new Sprite('images/sprites.png', [6, 102], [12, 12]) });
+        // bullets.push({ pos: [x, y],
+        //                dir: 'up',
+        //                sprite: new Sprite('images/sprites.png', [0, 102], [9, 5]) });
+        // bullets.push({ pos: [x, y],
+        //                dir: 'down',
+        //                sprite: new Sprite('images/sprites.png', [0, 102], [9, 5]) });
 
         lastFire = Date.now();
     }
@@ -230,7 +230,7 @@ function checkCollisions() {
             }
         }
 
-        if(boxCollides(pos, size, player.pos, player.sprite.size)) {
+        if (boxCollides(pos, size, player.pos, player.sprite.size)) {
             gameOver();
         }
     }
@@ -286,6 +286,8 @@ function gameOver() {
     document.getElementById('game-over').style.display = 'block';
     document.getElementById('game-over-overlay').style.display = 'block';
     isGameOver = true;
+
+    socket.
 }
 
 // Reset game to original state

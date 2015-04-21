@@ -3,7 +3,6 @@
     var loading = [];
     var readyCallbacks = [];
 
-    // Load an image url or an array of image urls
     function load(urlOrArr) {
         if(urlOrArr instanceof Array) {
             urlOrArr.forEach(function(url) {

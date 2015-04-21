@@ -13,4 +13,36 @@ canvas {
   right: 0;
   bottom: 0;
   margin: auto;
+
+  z-index: 0;
+}
+
+
+
+
+.Score {
+  text-align: center;
+  padding: 1em;
+}
+
+#game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 1;
+
+  background: #fff;
+  background: rgba(255,255,255,.95);
+}
+
+#game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
