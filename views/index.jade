@@ -6,10 +6,18 @@ html.no-js(lang='en')
     title Daytona Chat
     link(rel='stylesheet' href='/style.css')
   body
+    
+    div(id='game-over-overlay')
 
-    canvas(id='game')
+    div(id='game-over')
+        h1 Game Over!
+        button(id='play-again') Play again
+
+    div(id='score')
 
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js')
     script(src='/socket.io/socket.io.js')
-    script(src='loadResources.js')
-    script(src='client.js')
+    script(src='js/loadResources.js')
+    script(src='js/input.js')
+    script(src='js/sprite.js')
+    script(src='js/client.js')

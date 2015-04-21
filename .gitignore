@@ -1,0 +1,19 @@
+# Environment files
+npm-debug.log
+.DS_Store
+
+# Libs
+dist
+node_modules
+
+# Project
+*-project
+*-workspace
+*-config.json
+dist
+uploads/
+node_modules
+.sass-cache/
+Underlag/
+config.rb/
+sitemap.xml
