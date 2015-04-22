@@ -32,7 +32,6 @@
   var isGameOver;
 
   var score = 0;
-  var scoreEl = document.getElementById('score');
 
   // Speed in pixels per second
   var playerSpeed = 200;
@@ -40,8 +39,16 @@
   var enemySpeed = 100;
 
   // Game size
-  var canvasWidth = 500;
-  var canvasHeight = 500;
+  var winWidth = window.innerWidth;
+  var winHeight = window.innerHeight;
+  var canvasWidth = winWidth;
+  var canvasHeight = winHeight;
+
+  if (winWidth > 600 && winHeight > 600) {
+    canvasWidth = 500;
+    canvasHeight = 500;
+  }
+  
 
 
 
@@ -49,6 +56,7 @@
 
 
   // Let’s get all of them elements!
+  var $score = $('.js-score');
   var $gameOver = $('.js-gameOver');
   var $overlay = $('.js-overlay');
   var $form = $('#highschore-form');
@@ -124,7 +132,7 @@
 
     checkCollisions();
 
-    scoreEl.innerHTML = score;
+    $score.text(score);
   };
 
 
@@ -393,11 +401,9 @@
 
   // Highscore dialog
   var dialog = document.getElementById('dialog');
-
   $showDialog.on('click', function() {
     dialog.showModal();
   });
-
   $closeDialog.on('click', function() {
     dialog.close();
   });
