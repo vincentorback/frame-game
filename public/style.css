@@ -170,17 +170,18 @@ canvas {
 
 .Dialog-highscores {
   margin-top: 1em;
-} 
-#show-dialog {
+}
+
+.Dialog-open {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 6;
 }
-#show-dialog:hover {
+.Dialog-open:hover {
   opacity: 1;
 }
-#close-dialog {
+.Dialog-close {
   float: right;
 }
 

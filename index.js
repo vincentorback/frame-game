@@ -122,11 +122,19 @@ io.sockets.on('connection', function (socket) {
         });
       });
 
-      
-
       socket.broadcast.emit('alert', {
         message: scoreData.name + ' fick precis ' + scoreData.score + ' poäng!'
       });
+
+      // Emit to slack :)
+      // request({
+      //   uri: 'https://hooks.slack.com/services/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',
+      //   method: 'POST',
+      //   body: JSON.stringify({
+      //     username: 'Daytona Zombie Challenge',
+      //     text: scoreData.name + ' fick precis ' + scoreData.score + ' poäng i Daytona Zombie Challenge!'
+      //   })
+      // });
 
     } else {
       socket.emit('alert', {

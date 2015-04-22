@@ -3,28 +3,30 @@ html.no-js(lang='en')
   head
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    title Daytona Zombie Hunt
+    title Daytona Zombie Challenge
     link(rel='stylesheet' href='/style.css')
   body
-    
-    .Overlay(id='game-over-overlay' style='display:none')
 
-    .GameOver(id='game-over' style='display:none')
+    .Score
+      p Poäng: 
+        span(id='score')
+
+    .Overlay.js-overlay(style='display:none')
+
+    .GameOver.js-gameOver(style='display:none')
       h1 Game Over!
 
       form.Form(id='highschore-form')
         input(type='text' placeholder='Skriv ditt namn!' id='highschore-name')
         button.Button(type='submit') Skicka
 
-      button.Button(id='play-again') Spela igen
+      button.Button.js-playAgain Spela igen
 
-    .Score
-      p Poäng: 
-        span(id='score')
+    
 
     .Alert(id='alert')
 
-    button.Button(id='show-dialog') Instruktioner
+    button.Dialog-open.Button.js-showDialog Instruktioner
 
     dialog.Dialog(id='dialog')
       .Dialog-info
@@ -49,9 +51,7 @@ html.no-js(lang='en')
                 td #{score.score}
                 td #{score.niceDate}
 
-      menu
-        button.Button(id='close-dialog') Stäng
-        
+      button.Dialog-close.Button.js-closeDialog Stäng
 
 
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js')

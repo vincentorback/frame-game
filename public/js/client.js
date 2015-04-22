@@ -1,5 +1,7 @@
-
 (function (window) {
+  'use strict';
+
+
 
   // requestAnimationFrame polyfill
   var requestAnimFrame = (function () {
@@ -8,10 +10,11 @@
       window.mozRequestAnimationFrame    ||
       window.oRequestAnimationFrame      ||
       window.msRequestAnimationFrame     ||
-      function (callback){
+      function (callback) {
         window.setTimeout(callback, 1000 / 60);
       };
   }());
+
 
 
   // Game variables
@@ -45,14 +48,29 @@
 
 
 
+  // Let’s get all of them elements!
+  var $gameOver = $('.js-gameOver');
+  var $overlay = $('.js-overlay');
+  var $form = $('#highschore-form');
+  var $formName = $('#highschore-name');
+
+  var $showDialog = $('.js-showDialog');
+  var $closeDialog = $('.js-closeDialog');
+
+  var $playAgain = $('.js-playAgain');
+
+  var $alert = $('#alert');
+  var $highscoreTable = $('#highscore-table');
+
+
 
 
 
 
 
   // Create the canvas
-  var canvas = document.createElement("canvas");
-  var ctx = canvas.getContext("2d");
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   document.body.appendChild(canvas);
@@ -76,14 +94,12 @@
 
     lastTime = now;
     requestAnimFrame(main);
-  };
+  }
 
 
   // Initialize the game
   function init() {
-    document.getElementById('play-again').addEventListener('click', function() {
-      reset();
-    });
+    $playAgain.on('click', reset);
 
     reset();
     lastTime = Date.now();
@@ -308,21 +324,31 @@
   }
 
 
-  var highscoreForm = document.getElementById('highschore-form');
+
+
+
+
+
+  // Let’s get all 'em elements!
+
+
+
 
 
   // Game over
   function gameOver() {
-    document.getElementById('game-over').style.display = 'block';
-    document.getElementById('game-over-overlay').style.display = 'block';
-    highscoreForm.style.display = 'block';
+    $gameOver.show();
+    $overlay.show();
+
+    $form.show();
     isGameOver = true;
   }
 
   // Reset game to original state
   function reset() {
-    document.getElementById('game-over').style.display = 'none';
-    document.getElementById('game-over-overlay').style.display = 'none';
+    $gameOver.hide();
+    $overlay.hide();
+
     isGameOver = false;
     gameTime = 0;
     score = 0;
@@ -346,42 +372,49 @@
 
 
 
-  // Highscore form
-  var nameInput = document.getElementById('highschore-name');
-  highscoreForm.addEventListener('submit', function (event) {
 
+
+  // Highscore form
+  $form.on('submit', function (event) {
     socket.emit('savescore', {
-      name: nameInput.value,
+      name: $formName.val(),
       score: score
     });
 
-    highscoreForm.style.display = 'none';
+    $form.hide();
 
     event.preventDefault();
-  }, false);
+  });
+
+
+
+
 
 
   // Highscore dialog
   var dialog = document.getElementById('dialog');
-  document.getElementById('show-dialog').addEventListener('click', function() {
+
+  $showDialog.on('click', function() {
     dialog.showModal();
-  }, false);
-  document.getElementById('close-dialog').addEventListener('click', function() {
+  });
+
+  $closeDialog.on('click', function() {
     dialog.close();
-  }, false);
+  });
+
 
 
 
 
 
   // Socket events
-  var $alert = $('#alert');
-  var $highscoreTable = $('#highscore-table');
-  var newHighscore = '<tbody>';
-
+  
+  // Show alert messages and update highscores
   socket.on('alert', function (data) {
     $alert.html(data.message);
     $alert.addClass('is-active');
+
+    var newHighscore = '<tbody>';
 
     if (data.openDialog) {
       for (var i = 0; i < data.highscore.length; i += 1) {
@@ -398,5 +431,8 @@
       $alert.removeClass('is-active');
     }, 10000);
   });
+
+
+
 
 }(this));
