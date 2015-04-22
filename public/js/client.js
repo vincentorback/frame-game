@@ -126,7 +126,7 @@
     if (Math.random() < 1 - Math.pow(.993, gameTime)) {
       enemies.push({
         pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
-        sprite: new Sprite('images/sprites.png', [0, 45], [22, 44], 22, [1, 0, 7, 6, 5, 4, 3, 2])
+        sprite: new Sprite('images/sprites.png', [0, 66], [22, 44], 22, [1, 0, 7, 6, 5, 4, 3, 2])
       });
     }
 
@@ -162,7 +162,7 @@
       bullets.push({
         pos: [x, y],
         dir: 'forward',
-        sprite: new Sprite('images/sprites.png', [5, 93], [12, 12])
+        sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
       });
 
       /*
@@ -270,7 +270,7 @@
           // Add an explosion
           explosions.push({
             pos: pos,
-            sprite: new Sprite('images/sprites.png', [22, 89], [22, 22], 16, [0, 1, 2], null, true)
+            sprite: new Sprite('images/sprites.png', [22, 132], [22, 22], 16, [0, 1, 2], null, true)
           });
 
           // Remove the bullet and stop this iteration
