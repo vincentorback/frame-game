@@ -116,7 +116,7 @@ io.sockets.on('connection', function (socket) {
         if (err) throw err;
 
         socket.emit('alert', {
-          message: 'Hurra du är med i highscore listan!',
+          message: 'Hurra du kom med i highscore!',
           openDialog: true,
           highscore: highscore
         });
@@ -130,7 +130,7 @@ io.sockets.on('connection', function (socket) {
 
     } else {
       socket.emit('alert', {
-        message: 'Ojdå, du kom visst inte med i highscore-listan med dina ' + scoreData.score + ' poäng... <br> Försök igen!'
+        message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... <br> Försök igen!'
       });
     }
 
