@@ -24,6 +24,7 @@ var env = new Habitat('daytona');
 
 // Set up database
 var db = monk(process.env.MONGOLAB_URI);
+var highscore = db.get('highscore');
 
 
 
@@ -65,11 +66,10 @@ var io = require('socket.io').listen(app.listen(app.get('port')));
 // Rendering front view
 app.get('/', function (req, res) {
   // Get posts from database.
-  var posts = db.get('posts');
-  posts.find({}, {sort: {date: -1}}, function (err, posts) {
+  highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
     if (err) throw err;
     res.render('index', {
-      posts: posts
+      highscore: highscore.length ? highscore : false
     });
   });
 });
@@ -82,56 +82,59 @@ app.get('/', function (req, res) {
 
 
 
-
-
-function saveAndEmitPost(post) {
-  var date = new Date(),
-    niceDate = date.getHours() + ':' + date.getMinutes();
-
-  io.emit('chat', {
-    message: post.message,
-    username: post.username || 'Anonymous',
-    date: niceDate
-  });
-
-  // Saving to database with timestamp
-  posts.insert({
-    body: post.message,
-    username: post.username || 'Anonymous',
-    date: date.getTime(),
-    niceDate: niceDate
-  });
-}
-
-
-// This is where we’ll recieve messages
-// https://api.slack.com/outgoing-webhooks
-app.use('/slack-chat', function (req, res) {
-  res.json({
-    message: 'Hooray! Thanks for the post!'
-  });
-
-  saveAndEmitPost({
-    message: req.body.text.replace('#simonsays', ''),
-    username: req.body.user_name
-  });
-});
-
-
-
+var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
 io.sockets.on('connection', function (socket) {
 
-  socket.userid = _.uniqueId();
+  socket.on('savescore', function (scoreData) {
+    var date = new Date(),
+      niceHour = date.getHours() > 9 ? date.getHours() : (0 + '' + date.getHours()),
+      niceMinutes = date.getMinutes() > 9 ? date.getMinutes() : (0 + '' + date.getMinutes()),
+      niceDate = niceHour + ':' + niceMinutes + ' - ' + date.getDate() + ' ' + months[date.getMonth()],
+      scoreTen;
 
-  socket.emit('connected', {
-    id: socket.userid
+    highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+      if (err) throw err;
+      if (highscore && highscore[9]) {
+        scoreTen = highscore[9].score;
+      }
+    });
+
+    if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === 0)) {
+      if (scoreTen) {
+        highscore.remove({score: scoreTen}); // Remove lowest score
+      }
+
+      highscore.insert({
+        score: scoreData.score,
+        name: scoreData.name || 'Anonym',
+        date: date.getTime(),
+        niceDate: niceDate
+      });
+
+      highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+        if (err) throw err;
+
+        socket.emit('alert', {
+          message: 'Hurra du är med i highscore listan!',
+          openDialog: true,
+          highscore: highscore
+        });
+      });
+
+      
+
+      socket.broadcast.emit('alert', {
+        message: scoreData.name + ' fick precis ' + scoreData.score + ' poäng!'
+      });
+
+    } else {
+      socket.emit('alert', {
+        message: 'Ojdå, du kom visst inte med i highscore-listan med dina ' + scoreData.score + ' poäng... <br> Försök igen!'
+      });
+    }
+
   });
-
-  socket.on('disconnect', function () {
-    
-  });
-
 });
 
 

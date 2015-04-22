@@ -1,9 +1,18 @@
 * {
   box-sizing: border-box;
   font-family: monospace;
+  font-size: 100%;
+  line-height: 1.5;
   color: #111;
   margin: 0;
   padding: 0;
+}
+
+input,
+button {
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
 }
 
 canvas {
@@ -19,13 +28,70 @@ canvas {
 
 
 
+.Button {
+  background: #6cc055;
+  color: #fff;
+  padding: 1em 2em;
+  border-radius: 2em;
+  cursor: pointer;
+
+  transition: background 200ms ease;
+}
+
+.Button:hover,
+.Button:active {
+  outline: none;
+  background: #5fa94b;
+}
+.Button:focus {
+
+}
+
+
+
 
 .Score {
+  position: relative;
+  z-index: 3;
   text-align: center;
   padding: 1em;
 }
 
-#game-over-overlay {
+
+
+
+
+
+.Alert {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: auto;
+  z-index: 5;
+  padding: .5em 1em;
+
+  background: #6cc055;
+  color: #fff;
+
+  opacity: 0;
+  transform: translateY(0);
+  transition: all 400ms ease 400ms;
+}
+.Alert.is-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+
+
+
+
+
+
+
+.Overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -35,14 +101,100 @@ canvas {
   z-index: 1;
 
   background: #fff;
-  background: rgba(255,255,255,.95);
+  background: rgba(255,255,255,.8);
 }
 
-#game-over {
+.GameOver {
   position: absolute;
   top: 50%;
   left: 50%;
   z-index: 2;
   transform: translate(-50%, -50%);
+  
+  min-width: 450px;
   text-align: center;
+}
+
+.GameOver h1 {
+  font-size: 2em;
+}
+
+.GameOver button {
+  margin-top: 1em;
+}
+
+
+
+
+
+.Form {
+  display: flex;
+  margin: 1em 0;
+}
+.Form input,
+.Form button {
+  border-radius: 0;
+  margin: 0;
+  min-width: 150px;
+}
+
+
+.Form input {
+  background: #fff;
+  color: #111;
+  padding: 1em 2em;
+  flex-grow: 1;
+}
+
+
+
+
+.Dialog {
+  width: 80%;
+  max-width: 600px;
+  margin: 0 auto;
+
+  padding: 0 20px 20px;
+  box-sizing: content-box;
+}
+
+.Dialog h1 {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.Dialog h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.Dialog-highscores {
+  margin-top: 1em;
+} 
+#show-dialog {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 6;
+}
+#show-dialog:hover {
+  opacity: 1;
+}
+#close-dialog {
+  float: right;
+}
+
+.Dialog-highscores table {
+  text-align: left;
+  width: 100%;
+}
+
+.Dialog-highscores th {
+  font-weight: 600;
+}
+
+@media (min-width:800px) {
+  .Dialog {
+    padding: 40px;
+  }
 }
