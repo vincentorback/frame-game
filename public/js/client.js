@@ -25,6 +25,7 @@
 
   var bullets = [];
   var enemies = [];
+  // var bosses = [];
   var explosions = [];
 
   var lastFire = Date.now();
@@ -37,6 +38,7 @@
   var playerSpeed = 200;
   var bulletSpeed = 500;
   var enemySpeed = 100;
+  // var bossSpeed = 20;
 
   // Game size
   var winWidth = window.innerWidth;
@@ -130,6 +132,14 @@
       });
     }
 
+    // It gets harder over time by adding enemies using this equation: 1-.993^gameTime
+    // if (Math.random() < 1 - Math.pow(.9995, gameTime)) {
+    //   bosses.push({
+    //     pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
+    //     sprite: new Sprite('images/sprites.png', [0, 176], [40, 80], 12, [1, 0, 7, 6, 5, 4, 3, 2])
+    //   });
+    // }
+
     checkCollisions();
 
     $score.text(score);
@@ -208,6 +218,7 @@
       }
     }
 
+
     // Update all enemies
     for (var i = 0; i < enemies.length; i += 1) {
       enemies[i].pos[0] -= enemySpeed * dt;
@@ -219,6 +230,22 @@
         i--;
       }
     }
+
+
+
+    // Update all enemies
+    // for (var i = 0; i < bosses.length; i += 1) {
+    //   bosses[i].pos[0] -= bossSpeed * dt;
+    //   bosses[i].sprite.update(dt);
+
+    //   // Remove if offscreen
+    //   if (bosses[i].pos[0] + bosses[i].sprite.size[0] < 0) {
+    //     bosses.splice(i, 1);
+    //     i--;
+    //   }
+    // }
+
+
 
     // Update all explosions
     for (var i = 0; i < explosions.length; i += 1) {
@@ -283,6 +310,43 @@
         gameOver();
       }
     }
+
+
+    // Run collision detection for all enemies and bullets
+    // for(var i = 0; i < bosses.length; i += 1) {
+    //   var pos = bosses[i].pos;
+    //   var size = bosses[i].sprite.size;
+
+    //   for (var j = 0; j < bullets.length; j += 1) {
+    //     var pos2 = bullets[j].pos;
+    //     var size2 = bullets[j].sprite.size;
+
+    //     if (boxCollides(pos, size, pos2, size2)) {
+    //       // Remove the enemy
+    //       bosses.splice(i, 1);
+    //       i--;
+
+    //       // Add score
+    //       score += 500;
+
+    //       // Add an explosion
+    //       explosions.push({
+    //         pos: pos,
+    //         sprite: new Sprite('images/sprites.png', [22, 132], [22, 22], 16, [0, 1, 2], null, true)
+    //       });
+
+    //       // Remove the bullet and stop this iteration
+    //       bullets.splice(j, 1);
+    //       break;
+    //     }
+    //   }
+
+    //   if (boxCollides(pos, size, player.pos, player.sprite.size)) {
+    //     gameOver();
+    //   }
+    // }
+
+
   }
 
   function checkPlayerBounds() {
@@ -315,6 +379,7 @@
 
     renderEntities(bullets);
     renderEntities(enemies);
+    // renderEntities(bosses);
     renderEntities(explosions);
   }
 
