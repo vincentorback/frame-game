@@ -100,7 +100,7 @@ io.sockets.on('connection', function (socket) {
       }
     });
 
-    if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === 0)) {
+    if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
       if (scoreTen) {
         highscore.remove({score: scoreTen}); // Remove lowest score
       }
