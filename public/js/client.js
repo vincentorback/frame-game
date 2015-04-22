@@ -308,12 +308,14 @@
   }
 
 
+  var highscoreForm = document.getElementById('highschore-form');
 
 
   // Game over
   function gameOver() {
     document.getElementById('game-over').style.display = 'block';
     document.getElementById('game-over-overlay').style.display = 'block';
+    highscoreForm.style.display = 'block';
     isGameOver = true;
   }
 
@@ -345,7 +347,6 @@
 
 
   // Highscore form
-  var highscoreForm = document.getElementById('highschore-form');
   var nameInput = document.getElementById('highschore-name');
   highscoreForm.addEventListener('submit', function (event) {
 
