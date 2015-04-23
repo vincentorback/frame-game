@@ -142,7 +142,6 @@ canvas {
 
 
 .Form {
-  display: flex;
   margin: 1em 0;
 }
 .Form input,
@@ -157,7 +156,6 @@ canvas {
   background: #fff;
   color: #111;
   padding: 1em 2em;
-  flex-grow: 1;
 }
 
 

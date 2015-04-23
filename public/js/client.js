@@ -35,11 +35,10 @@
   var canvasWidth = winWidth;
   var canvasHeight = winHeight;
 
-  if (winWidth > 600 && winHeight > 600) {
-    canvasWidth = 500;
-    canvasHeight = 500;
-  }
-  
+
+
+
+
 
 
 
@@ -70,9 +69,28 @@
   // Create the canvas
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
+
+  if (winWidth > 600 && winHeight > 600) {
+    canvasWidth = 500;
+    canvasHeight = 500;
+    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
+  } else {
+    canvas.style.bottom = (document.getElementById('footer').offsetHeight * 2) + 'px';
+  }
+  
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   document.body.appendChild(canvas);
+
+
+
+
+
+
+
+
+
+
 
 
   // We need to load all your assets before starting the game so that they can be immediately used.
