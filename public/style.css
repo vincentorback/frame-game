@@ -94,6 +94,7 @@ canvas {
 }
 
 .Footer-score {
+  min-width: 200px;
 }
 
 .Footer-button {
