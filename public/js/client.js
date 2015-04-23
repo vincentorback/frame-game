@@ -52,6 +52,7 @@
   var $form = $('#highschore-form');
   var $formName = $('#highschore-name');
 
+  var $dialog = $('.js-dialog');
   var $showDialog = $('.js-showDialog');
   var $closeDialog = $('.js-closeDialog');
 
@@ -443,12 +444,11 @@
 
 
   // Highscore dialog
-  var dialog = document.getElementById('dialog');
   $showDialog.on('click', function() {
-    dialog.showModal();
+    $dialog.show();
   });
   $closeDialog.on('click', function() {
-    dialog.close();
+    $dialog.hide();
   });
 
 

@@ -35,6 +35,7 @@ canvas {
   cursor: pointer;
 
   transition: background 200ms ease;
+  -webkit-transition: background 200ms ease;
 }
 
 .Button:hover,
@@ -82,10 +83,14 @@ canvas {
   opacity: 0;
   transform: translateY(0);
   transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
+
+  -webkit-transform: translateY(0);
+  -webkit-transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
 }
 .Footer-alert.is-active {
   opacity: 1;
   transform: translateY(0);
+  -webkit-transform: translateY(0);
 }
 
 .Footer-score {
@@ -113,6 +118,7 @@ canvas {
 
   z-index: 2;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
   
   min-width: 450px;
   text-align: center;
@@ -157,7 +163,21 @@ canvas {
 
 
 
+.Dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
 
+  z-index: 99;
+
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+
+  padding: 1em;
+  border: 5px solid #000;
+  background: white;
+  color: black;
+}
 
 
 
