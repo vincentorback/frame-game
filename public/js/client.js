@@ -3,18 +3,6 @@
 
 
 
-  // requestAnimationFrame polyfill
-  var requestAnimFrame = (function () {
-    return window.requestAnimationFrame  ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame    ||
-      window.oRequestAnimationFrame      ||
-      window.msRequestAnimationFrame     ||
-      function (callback) {
-        window.setTimeout(callback, 1000 / 60);
-      };
-  }());
-
 
 
   // Game variables
@@ -61,7 +49,6 @@
   // Let’s get all of them elements!
   var $score = $('.js-score');
   var $gameOver = $('.js-gameOver');
-  var $overlay = $('.js-overlay');
   var $form = $('#highschore-form');
   var $formName = $('#highschore-name');
 
@@ -70,7 +57,7 @@
 
   var $playAgain = $('.js-playAgain');
 
-  var $alert = $('#alert');
+  var $alert = $('.js-alert');
   var $highscoreTable = $('#highscore-table');
 
 
@@ -87,14 +74,25 @@
   document.body.appendChild(canvas);
 
 
-  // Set up and load all resources that we’ll need!
+  // We need to load all your assets before starting the game so that they can be immediately used.
+  // Like this, we can cache our resources.
   resources.load([
     'images/sprites.png'
   ]);
   resources.onReady(init);
 
 
-  // The main game loop
+  /*
+  MAIN GAME LOOOOOP
+
+  The update function takes the time that has changed since the last update.
+  The game will run wildly different on various computers and platforms,
+  so we need to update your scene independently of framerate.
+
+  This is achieved by calculating the time since last update (in seconds),
+  and expressing all movements in pixels/second units.
+  Movement then becomes x += 50 * dt, or "50 pixels per second".
+  */
   var lastTime;
   function main() {
     var now = Date.now();
@@ -104,7 +102,7 @@
     render();
 
     lastTime = now;
-    requestAnimFrame(main);
+    window.requestAnimationFrame(main);
   }
 
 
@@ -128,22 +126,22 @@
     // It gets harder over time by adding enemies using this equation: 1-.993^gameTime
     if (Math.random() < 1 - Math.pow(.993, gameTime)) {
       enemies.push({
-        pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
+        pos: [canvasWidth, Math.random() * (canvasHeight - 44)],
         sprite: new Sprite('images/sprites.png', [0, 66], [22, 44], 22, [1, 0, 7, 6, 5, 4, 3, 2])
       });
     }
 
     // Tokens appear less frequest
-    if (Math.random() < 1 - Math.pow(.9997, gameTime)) {
+    if (Math.random() < 1 - Math.pow(.9998, gameTime)) {
       tokens.push({
-        pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
+        pos: [canvasWidth, Math.random() * (canvasHeight - 18)],
         sprite: new Sprite('images/sprites.png', [2, 156], [18, 18], 1, [0])
       });
     }
 
     checkCollisions();
 
-    $score.text(score);
+    $score.text(' ' + score);
   };
 
 
@@ -258,6 +256,8 @@
   }
 
 
+
+
   // Collision calculations :)
   function collides(x, y, r, b, x2, y2, r2, b2) {
     return !(r <= x2 || x > r2 || b <= y2 || y > b2);
@@ -272,11 +272,13 @@
     );
   }
 
+  var tokenTimeout;
+
   function checkCollisions() {
     checkPlayerBounds();
     
     // Run collision detection for all enemies and bullets
-    for(var i = 0; i < enemies.length; i += 1) {
+    for (var i = 0; i < enemies.length; i += 1) {
       var pos = enemies[i].pos;
       var size = enemies[i].sprite.size;
 
@@ -311,7 +313,7 @@
 
 
     // Run collision detection for all enemies and bullets
-    for(var i = 0; i < tokens.length; i += 1) {
+    for (var i = 0; i < tokens.length; i += 1) {
       var pos = tokens[i].pos;
       var size = tokens[i].sprite.size;
 
@@ -321,7 +323,7 @@
 
         hasPowerUp = true;
         player.sprite.speed = 24;
-        window.setTimeout(function () {
+        tokenTimeout = setTimeout(function () {
           hasPowerUp = false;
           player.sprite.speed = 12;
         }, 5000);
@@ -340,8 +342,7 @@
 
     if (player.pos[1] < 0) {
       player.pos[1] = 0;
-    }
-    else if (player.pos[1] > canvasHeight - player.sprite.size[1]) {
+    } else if (player.pos[1] > canvasHeight - player.sprite.size[1]) {
       player.pos[1] = canvasHeight - player.sprite.size[1];
     }
   }
@@ -354,7 +355,7 @@
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     // Render the player if the game isn't over
-    if(!isGameOver) {
+    if (!isGameOver) {
       renderEntity(player);
     }
 
@@ -383,16 +384,12 @@
 
 
 
-  // Let’s get all 'em elements!
-
-
 
 
 
   // Game over
   function gameOver() {
     $gameOver.show();
-    $overlay.show();
 
     $form.show();
     isGameOver = true;
@@ -401,7 +398,6 @@
   // Reset game to original state
   function reset() {
     $gameOver.hide();
-    $overlay.hide();
 
     isGameOver = false;
     gameTime = 0;

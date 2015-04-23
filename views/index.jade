@@ -7,11 +7,19 @@ html.no-js(lang='en')
     link(rel='stylesheet' href='/style.css')
   body
 
-    .Score
-      p Poäng: 
-        span.js-score
 
-    .Overlay.js-overlay(style='display:none')
+
+
+    aside.Footer
+      .Footer-score
+        p Poäng:
+          span.js-score  0
+      .Footer-alert.js-alert Hurra du kom med i highscore!
+      .Footer-info
+        button.Button.js-showDialog Instruktioner
+
+
+
 
     .GameOver.js-gameOver(style='display:none')
       h1 Game Over!
@@ -23,10 +31,6 @@ html.no-js(lang='en')
       button.Button.js-playAgain Spela igen
 
     
-
-    .Alert(id='alert')
-
-    button.Dialog-open.Button.js-showDialog Instruktioner
 
     dialog.Dialog(id='dialog')
       .Dialog-info
@@ -53,6 +57,7 @@ html.no-js(lang='en')
 
       button.Dialog-close.Button.js-closeDialog Stäng
 
+    
 
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js')
     script(src='/socket.io/socket.io.js')

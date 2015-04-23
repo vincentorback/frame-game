@@ -1,21 +1,30 @@
+/* Simpler input handler */
+
 (function (window) {
+  'use strict';
+
   var pressedKeys = {};
 
   function setKey(event, status) {
     var code = event.keyCode;
     var key;
 
-    switch(code) {
+    switch (code) {
     case 32:
-      key = 'SPACE'; break;
+      key = 'SPACE';
+      break;
     case 37:
-      key = 'LEFT'; break;
+      key = 'LEFT';
+      break;
     case 38:
-      key = 'UP'; break;
+      key = 'UP';
+      break;
     case 39:
-      key = 'RIGHT'; break;
+      key = 'RIGHT';
+      break;
     case 40:
-      key = 'DOWN'; break;
+      key = 'DOWN';
+      break;
     default:
       key = String.fromCharCode(code);
     }
@@ -31,12 +40,12 @@
     setKey(e, false);
   });
 
-  window.addEventListener('blur', function() {
+  window.addEventListener('blur', function () {
     pressedKeys = {};
   });
 
   window.input = {
-    isDown: function(key) {
+    isDown: function (key) {
       return pressedKeys[key.toUpperCase()];
     }
   };

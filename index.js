@@ -49,7 +49,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(session({
-  name: 'daytona-clash',
+  name: 'daytona-zombies',
   secret: _.uniqueId(),
   saveUninitialized: true,
   resave: true,
@@ -64,7 +64,7 @@ var io = require('socket.io').listen(app.listen(app.get('port')));
 
 
 // Rendering front view
-app.get('/', function (req, res) {
+app.use('/', function (req, res) {
   // Get posts from database.
   highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
     if (err) throw err;
