@@ -408,6 +408,7 @@
     score = 0;
 
     enemies = [];
+    tokens = [];
     bullets = [];
 
     player.pos = [5, canvasHeight - 44];
