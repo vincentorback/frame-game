@@ -25,7 +25,7 @@
 
   var bullets = [];
   var enemies = [];
-  // var bosses = [];
+  var tokens = [];
   var explosions = [];
 
   var lastFire = Date.now();
@@ -33,12 +33,13 @@
   var isGameOver;
 
   var score = 0;
+  var hasPowerUp = false;
 
   // Speed in pixels per second
   var playerSpeed = 200;
   var bulletSpeed = 500;
   var enemySpeed = 100;
-  // var bossSpeed = 20;
+  var tokenSpeed = 50;
 
   // Game size
   var winWidth = window.innerWidth;
@@ -132,13 +133,13 @@
       });
     }
 
-    // It gets harder over time by adding enemies using this equation: 1-.993^gameTime
-    // if (Math.random() < 1 - Math.pow(.9995, gameTime)) {
-    //   bosses.push({
-    //     pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
-    //     sprite: new Sprite('images/sprites.png', [0, 176], [40, 80], 12, [1, 0, 7, 6, 5, 4, 3, 2])
-    //   });
-    // }
+    // Tokens appear less frequest
+    if (Math.random() < 1 - Math.pow(.9998, gameTime)) {
+      tokens.push({
+        pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
+        sprite: new Sprite('images/sprites.png', [2, 156], [18, 18], 1, [0])
+      });
+    }
 
     checkCollisions();
 
@@ -175,22 +176,19 @@
         sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
       });
 
-      /*
-      Uncomment to shot in all directions :O
-      TODO: Add power-up to gameplay
+      if (hasPowerUp) {
+        bullets.push({
+          pos: [x, y],
+          dir: 'up',
+          sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
+        });
 
-      bullets.push({
-        pos: [x, y],
-        dir: 'up',
-        sprite: new Sprite('images/sprites.png', [5, 93], [12, 12])
-      });
-
-      bullets.push({
-        pos: [x, y],
-        dir: 'down',
-        sprite: new Sprite('images/sprites.png', [5, 93], [12, 12])
-      });
-      */
+        bullets.push({
+          pos: [x, y],
+          dir: 'down',
+          sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
+        });
+      }
 
       lastFire = Date.now();
     }
@@ -233,17 +231,17 @@
 
 
 
-    // Update all enemies
-    // for (var i = 0; i < bosses.length; i += 1) {
-    //   bosses[i].pos[0] -= bossSpeed * dt;
-    //   bosses[i].sprite.update(dt);
+    // Update all token
+    for (var i = 0; i < tokens.length; i += 1) {
+      tokens[i].pos[0] -= tokenSpeed * dt;
+      tokens[i].sprite.update(dt);
 
-    //   // Remove if offscreen
-    //   if (bosses[i].pos[0] + bosses[i].sprite.size[0] < 0) {
-    //     bosses.splice(i, 1);
-    //     i--;
-    //   }
-    // }
+      // Remove if offscreen
+      if (tokens[i].pos[0] + tokens[i].sprite.size[0] < 0) {
+        tokens.splice(i, 1);
+        i--;
+      }
+    }
 
 
 
@@ -313,39 +311,22 @@
 
 
     // Run collision detection for all enemies and bullets
-    // for(var i = 0; i < bosses.length; i += 1) {
-    //   var pos = bosses[i].pos;
-    //   var size = bosses[i].sprite.size;
+    for(var i = 0; i < tokens.length; i += 1) {
+      var pos = tokens[i].pos;
+      var size = tokens[i].sprite.size;
 
-    //   for (var j = 0; j < bullets.length; j += 1) {
-    //     var pos2 = bullets[j].pos;
-    //     var size2 = bullets[j].sprite.size;
+      if (boxCollides(pos, size, player.pos, player.sprite.size)) {
+        // Remove the token and stop this iteration
+        tokens.splice(i, 1);
 
-    //     if (boxCollides(pos, size, pos2, size2)) {
-    //       // Remove the enemy
-    //       bosses.splice(i, 1);
-    //       i--;
-
-    //       // Add score
-    //       score += 500;
-
-    //       // Add an explosion
-    //       explosions.push({
-    //         pos: pos,
-    //         sprite: new Sprite('images/sprites.png', [22, 132], [22, 22], 16, [0, 1, 2], null, true)
-    //       });
-
-    //       // Remove the bullet and stop this iteration
-    //       bullets.splice(j, 1);
-    //       break;
-    //     }
-    //   }
-
-    //   if (boxCollides(pos, size, player.pos, player.sprite.size)) {
-    //     gameOver();
-    //   }
-    // }
-
+        hasPowerUp = true;
+        player.sprite.speed = 24;
+        window.setTimeout(function () {
+          hasPowerUp = false;
+          player.sprite.speed = 12;
+        }, 5000);
+      }
+    }
 
   }
 
@@ -379,7 +360,7 @@
 
     renderEntities(bullets);
     renderEntities(enemies);
-    // renderEntities(bosses);
+    renderEntities(tokens);
     renderEntities(explosions);
   }
 

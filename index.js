@@ -78,6 +78,18 @@ app.get('/', function (req, res) {
 
 
 
+// API call to get current highscore
+app.get('/api/highscore', function (req, res) {
+  // Get posts from database.
+  highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+    if (err) throw err;
+    res.json(highscore);
+  });
+});
+
+
+
+
 
 
 
