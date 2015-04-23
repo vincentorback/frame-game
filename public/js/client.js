@@ -134,7 +134,7 @@
     }
 
     // Tokens appear less frequest
-    if (Math.random() < 1 - Math.pow(.9998, gameTime)) {
+    if (Math.random() < 1 - Math.pow(.9997, gameTime)) {
       tokens.push({
         pos: [canvasWidth, Math.random() * (canvasHeight - 39)],
         sprite: new Sprite('images/sprites.png', [2, 156], [18, 18], 1, [0])
