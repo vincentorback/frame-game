@@ -4,6 +4,16 @@
 
 
 
+  if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+    alert('Sorry! Det här spelet funkar bara på datorer just nu!');
+  }
+
+
+
+
+
+
+
 
   // Game variables
   var player = {
