@@ -336,7 +336,9 @@
       }
 
       if (boxCollides(pos, size, player.pos, player.sprite.size)) {
-        gameOver();
+        if (!isGameOver) {
+          gameOver();
+        }
       }
     }
 

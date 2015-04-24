@@ -145,7 +145,7 @@ io.sockets.on('connection', function (socket) {
 
       } else {
         socket.emit('alert', {
-          message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... <br> Försök igen!'
+          message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... Försök igen!'
         });
       }
 
