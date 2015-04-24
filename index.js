@@ -71,16 +71,7 @@ app.use('/', function (req, res) {
 
     // Remove scores after the 10th
     if (highscore.length > 10) {
-      io.emit('test', {
-        highscore: highscore.slice(10, highscore.length),
-        length: highscore.length
-      });
-      //highscore.remove(highscore.slice(highscore.length - 10, 10));
-    } else {
-      io.emit('test', {
-        highscore: 'All: ' + highscore,
-        length: highscore.length
-      });
+      highscore.remove(highscore.slice(10, highscore.length));
     }
 
     res.render('index', {
@@ -127,10 +118,8 @@ io.sockets.on('connection', function (socket) {
 
     if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
 
-      console.log(scoreTen);
-
-      if (scoreTen) {
-        highscore.remove({score: scoreTen}); // Remove lowest score
+      if (highscore.length > 10) {
+        highscore.remove(highscore.slice(10, highscore.length));
       }
 
       highscore.insert({
