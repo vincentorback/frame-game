@@ -58,14 +58,6 @@ app.use(session({
 
 
 
-// Set up web sockets
-var io = require('socket.io').listen(app.listen(app.get('port')));
-
-
-
-
-
-
 // API call to get current highscore
 app.get('/api/highscore', function (req, res) {
   // Get posts from database.
@@ -74,8 +66,6 @@ app.get('/api/highscore', function (req, res) {
     res.json(data);
   });
 });
-
-
 
 
 
@@ -100,11 +90,10 @@ app.use('/', function (req, res) {
 
 
 
-
-
-
 var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
+// Set up web sockets
+var io = require('socket.io').listen(app.listen(app.get('port')));
 io.sockets.on('connection', function (socket) {
 
   socket.on('savescore', function (scoreData) {
@@ -121,7 +110,6 @@ io.sockets.on('connection', function (socket) {
       }
 
       if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
-
         highscoreDB.insert({
           score: scoreData.score,
           name: scoreData.name || 'Anonym',
@@ -148,10 +136,7 @@ io.sockets.on('connection', function (socket) {
           message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... Försök igen!'
         });
       }
-
     });
 
   });
 });
-
-

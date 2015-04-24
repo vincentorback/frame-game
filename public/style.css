@@ -1,3 +1,10 @@
+:root {
+  --color-green: #6cc055;
+  --color-green-active: #5fa94b;
+}
+
+
+
 * {
   box-sizing: border-box;
   font-family: monospace;
@@ -6,6 +13,12 @@
   color: #111;
   margin: 0;
   padding: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+  height: 100%;
 }
 
 input,
@@ -30,8 +43,8 @@ canvas {
 .Button {
   background: #6cc055;
   color: #fff;
-  padding: 1em 2em;
-  border-radius: 2em;
+  padding: 10px 20px;
+  border-radius: 20px;
   cursor: pointer;
 
   transition: background 200ms ease;
@@ -48,22 +61,20 @@ canvas {
 
 .Alert {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 0;
+  left: 0;
 
-  min-width: 200px;
   max-width: 500px;
 
   padding: 10px 15px;
-
   background: #6cc055;
   color: #fff;
 
   opacity: 0;
-  transform: translateY(0);
+  transform: translateY(-40px);
   transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
 
-  -webkit-transform: translateY(0);
+  -webkit-transform: translateY(-40px);
   -webkit-transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
 }
 .Alert.is-active {
@@ -72,6 +83,13 @@ canvas {
   -webkit-transform: translateY(0);
 }
 
+@media (min-width: 600px) {
+  .Alert {
+    min-width: 200px;
+    top: 15px;
+    left: 15px;
+  }
+}
 
 
 
@@ -109,11 +127,6 @@ canvas {
 
 
 
-
-
-
-
-
 .GameOver {
   position: absolute;
   top: 50%;
@@ -121,21 +134,27 @@ canvas {
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
   z-index: 2;
+  
+  max-width: 450px;
+  width: 95%;
 
-  min-width: 450px;
   text-align: center;
-  padding: 2em;
+  padding: 15px;
 
   background: #fff;
   background: rgba(255,255,255,.9);
 }
-
 .GameOver h1 {
   font-size: 2em;
 }
-
 .GameOver button {
   margin-top: 1em;
+}
+
+@media (min-width: 600px) {
+  .GameOver {
+    min-width: 450px;
+  }
 }
 
 
@@ -161,31 +180,26 @@ canvas {
 
 
 
+
+
+
 .Dialog {
   position: absolute;
   top: 50%;
   left: 50%;
-
   z-index: 99;
 
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
 
-  padding: 1em;
-  border: 5px solid #000;
-  background: white;
-  color: black;
-}
-
-
-
-.Dialog {
   width: 80%;
   max-width: 600px;
   margin: 0 auto;
-
-  padding: 0 20px 20px;
-  box-sizing: content-box;
+  
+  padding: 30px;
+  border: 5px solid #000;
+  background: white;
+  color: black;
 }
 
 .Dialog h1 {
@@ -208,9 +222,11 @@ canvas {
 .Dialog-open:hover {
   opacity: 1;
 }
+
 .Dialog-close {
   float: right;
 }
+
 
 .Dialog-highscores table {
   text-align: left;
@@ -219,10 +235,4 @@ canvas {
 
 .Dialog-highscores th {
   font-weight: 600;
-}
-
-@media (min-width:800px) {
-  .Dialog {
-    padding: 40px;
-  }
 }

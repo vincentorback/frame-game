@@ -65,7 +65,7 @@
   var $showDialog = $('.js-showDialog');
   var $closeDialog = $('.js-closeDialog');
 
-  var $playAgain = $('.js-playAgain');
+  var $playButton = $('.js-playButton');
 
   var $alert = $('.js-alert');
   var $highscoreTable = $('#highscore-table');
@@ -99,10 +99,6 @@
 
 
 
-
-
-
-
   // We need to load all your assets before starting the game so that they can be immediately used.
   // Like this, we can cache our resources.
   resources.load([
@@ -112,7 +108,7 @@
 
 
   /*
-  MAIN GAME LOOOOOP
+  MAIN GAME LOOP
 
   The update function takes the time that has changed since the last update.
   The game will run wildly different on various computers and platforms,
@@ -125,7 +121,7 @@
   var lastTime;
   function main() {
     var now = Date.now();
-    var dt = (now - lastTime) / 1000.0;
+    var dt = (now - lastTime) / 1000.0; // time since last update
 
     update(dt);
     render();
@@ -137,7 +133,7 @@
 
   // Initialize the game
   function init() {
-    $playAgain.on('click', reset);
+    $playButton.on('click', reset);
 
     reset();
     lastTime = Date.now();
@@ -220,6 +216,9 @@
       lastFire = Date.now();
     }
   }
+
+
+
 
 
   function updateEntities(dt) {
@@ -337,6 +336,7 @@
 
       if (boxCollides(pos, size, player.pos, player.sprite.size)) {
         if (!isGameOver) {
+
           gameOver();
         }
       }
