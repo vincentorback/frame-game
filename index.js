@@ -68,6 +68,13 @@ app.use('/', function (req, res) {
   // Get posts from database.
   highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
     if (err) throw err;
+
+    // Remove scores after the 10th
+    if (highscore.length > 10) {
+      io.emit('test', highscore.slice(highscore.length - 10, 10));
+      //highscore.remove(highscore.slice(highscore.length - 10, 10));
+    }
+
     res.render('index', {
       highscore: highscore.length ? highscore : false
     });
@@ -86,8 +93,6 @@ app.get('/api/highscore', function (req, res) {
     res.json(highscore);
   });
 });
-
-
 
 
 
@@ -113,6 +118,9 @@ io.sockets.on('connection', function (socket) {
     });
 
     if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
+
+      console.log(scoreTen);
+
       if (scoreTen) {
         highscore.remove({score: scoreTen}); // Remove lowest score
       }

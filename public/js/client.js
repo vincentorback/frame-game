@@ -499,7 +499,8 @@
     }, 10000);
   });
 
-
-
+  socket.on('test', function (data) {
+    console.log(data);
+  });
 
 }(this));
