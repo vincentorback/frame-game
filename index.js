@@ -66,16 +66,16 @@ var io = require('socket.io').listen(app.listen(app.get('port')));
 // Rendering front view
 app.use('/', function (req, res) {
   // Get posts from database.
-  highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+  highscore.find({}, {sort: {score: -1}}, function (err, data) {
     if (err) throw err;
 
     // Remove scores after the 10th
-    if (highscore.length > 10) {
-      highscore.remove(highscore.slice(10, highscore.length));
+    if (data.length > 10) {
+      highscore.remove(data.slice(10, data.length));
     }
 
     res.render('index', {
-      highscore: highscore.length ? highscore : false
+      highscore: data.length ? data : false
     });
   });
 });
@@ -87,9 +87,9 @@ app.use('/', function (req, res) {
 // API call to get current highscore
 app.get('/api/highscore', function (req, res) {
   // Get posts from database.
-  highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+  highscore.find({}, {sort: {score: -1}}, function (err, data) {
     if (err) throw err;
-    res.json(highscore);
+    res.json(data);
   });
 });
 
@@ -109,17 +109,17 @@ io.sockets.on('connection', function (socket) {
       niceDate = niceHour + ':' + niceMinutes + ' - ' + date.getDate() + ' ' + months[date.getMonth()],
       scoreTen;
 
-    highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+    highscore.find({}, {sort: {score: -1}}, function (err, data) {
       if (err) throw err;
-      if (highscore && highscore[9]) {
-        scoreTen = highscore[9].score;
+      if (data && data[9]) {
+        scoreTen = data[9].score;
       }
     });
 
     if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
 
-      if (highscore.length > 10) {
-        highscore.remove(highscore.slice(10, highscore.length));
+      if (data.length > 10) {
+        highscore.remove(data.slice(10, data.length));
       }
 
       highscore.insert({
@@ -129,13 +129,13 @@ io.sockets.on('connection', function (socket) {
         niceDate: niceDate
       });
 
-      highscore.find({}, {sort: {score: -1}}, function (err, highscore) {
+      highscore.find({}, {sort: {score: -1}}, function (err, data) {
         if (err) throw err;
 
         socket.emit('alert', {
           message: 'Hurra du kom med i highscore!',
           openDialog: true,
-          highscore: highscore
+          highscore: data
         });
       });
 
