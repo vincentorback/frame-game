@@ -119,52 +119,37 @@ io.sockets.on('connection', function (socket) {
       if (data && data[9]) {
         scoreTen = data[9].score;
       }
-    });
 
-    if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
+      if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
 
-      if (data.length > 10) {
-        _.forEach(data.slice(10, data.length), function (score, i) {
-          highscoreDB.remove(score)
+        highscoreDB.insert({
+          score: scoreData.score,
+          name: scoreData.name || 'Anonym',
+          date: date.getTime(),
+          niceDate: niceDate
+        });
+
+        highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
+          if (err) throw err;
+
+          socket.emit('alert', {
+            message: 'Hurra du kom med i highscore!',
+            openDialog: true,
+            highscore: data
+          });
+        });
+
+        socket.broadcast.emit('alert', {
+          message: scoreData.name + ' fick precis ' + scoreData.score + ' poäng!'
+        });
+
+      } else {
+        socket.emit('alert', {
+          message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... <br> Försök igen!'
         });
       }
 
-      highscoreDB.insert({
-        score: scoreData.score,
-        name: scoreData.name || 'Anonym',
-        date: date.getTime(),
-        niceDate: niceDate
-      });
-
-      highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
-        if (err) throw err;
-
-        socket.emit('alert', {
-          message: 'Hurra du kom med i highscore!',
-          openDialog: true,
-          highscore: data
-        });
-      });
-
-      socket.broadcast.emit('alert', {
-        message: scoreData.name + ' fick precis ' + scoreData.score + ' poäng!'
-      });
-
-      // Emit to slack :)
-      // request({
-      //   uri: 'https://hooks.slack.com/services/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',
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     username: 'Daytona Zombie Challenge',
-      //     text: scoreData.name + ' fick precis ' + scoreData.score + ' poäng i Daytona Zombie Challenge!'
-      //   })
-      // });
-
-    } else {
-      socket.emit('alert', {
-        message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... <br> Försök igen!'
-      });
-    }
+    });
 
   });
 });

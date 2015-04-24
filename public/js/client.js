@@ -419,7 +419,6 @@
   // Game over
   function gameOver() {
     $gameOver.show();
-
     $form.show();
     isGameOver = true;
   }
@@ -475,6 +474,7 @@
   $showDialog.on('click', function() {
     $dialog.show();
   });
+  
   $closeDialog.on('click', function() {
     $dialog.hide();
   });
