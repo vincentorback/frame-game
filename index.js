@@ -24,7 +24,7 @@ var env = new Habitat('daytona');
 
 // Set up database
 var db = monk(process.env.MONGOLAB_URI);
-var highscore = db.get('highscore');
+var highscoreDB = db.get('highscore');
 
 
 
@@ -66,12 +66,14 @@ var io = require('socket.io').listen(app.listen(app.get('port')));
 // Rendering front view
 app.use('/', function (req, res) {
   // Get posts from database.
-  highscore.find({}, {sort: {score: -1}}, function (err, data) {
+  highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
     if (err) throw err;
 
     // Remove scores after the 10th
     if (data.length > 10) {
-      highscore.remove(data.slice(10, data.length));
+      _.forEach(data.slice(10, data.length), function (score, i) {
+        highscoreDB.remove(score)
+      });
     }
 
     res.render('index', {
@@ -87,7 +89,7 @@ app.use('/', function (req, res) {
 // API call to get current highscore
 app.get('/api/highscore', function (req, res) {
   // Get posts from database.
-  highscore.find({}, {sort: {score: -1}}, function (err, data) {
+  highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
     if (err) throw err;
     res.json(data);
   });
@@ -109,7 +111,7 @@ io.sockets.on('connection', function (socket) {
       niceDate = niceHour + ':' + niceMinutes + ' - ' + date.getDate() + ' ' + months[date.getMonth()],
       scoreTen;
 
-    highscore.find({}, {sort: {score: -1}}, function (err, data) {
+    highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
       if (err) throw err;
       if (data && data[9]) {
         scoreTen = data[9].score;
@@ -119,17 +121,19 @@ io.sockets.on('connection', function (socket) {
     if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
 
       if (data.length > 10) {
-        highscore.remove(data.slice(10, data.length));
+        _.forEach(data.slice(10, data.length), function (score, i) {
+          highscoreDB.remove(score)
+        });
       }
 
-      highscore.insert({
+      highscoreDB.insert({
         score: scoreData.score,
         name: scoreData.name || 'Anonym',
         date: date.getTime(),
         niceDate: niceDate
       });
 
-      highscore.find({}, {sort: {score: -1}}, function (err, data) {
+      highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
         if (err) throw err;
 
         socket.emit('alert', {
