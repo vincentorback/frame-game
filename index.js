@@ -103,11 +103,6 @@ app.use('/', function (req, res) {
 
 
 
-
-
-
-
-
 var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
 io.sockets.on('connection', function (socket) {
