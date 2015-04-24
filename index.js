@@ -63,6 +63,22 @@ var io = require('socket.io').listen(app.listen(app.get('port')));
 
 
 
+
+
+
+// API call to get current highscore
+app.get('/api/highscore', function (req, res) {
+  // Get posts from database.
+  highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
+    if (err) throw err;
+    res.json(data);
+  });
+});
+
+
+
+
+
 // Rendering front view
 app.use('/', function (req, res) {
   // Get posts from database.
@@ -86,14 +102,6 @@ app.use('/', function (req, res) {
 
 
 
-// API call to get current highscore
-app.get('/api/highscore', function (req, res) {
-  // Get posts from database.
-  highscoreDB.find({}, {sort: {score: -1}}, function (err, data) {
-    if (err) throw err;
-    res.json(data);
-  });
-});
 
 
 
