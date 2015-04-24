@@ -49,6 +49,34 @@ canvas {
 
 
 
+.Alert {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+
+  min-width: 200px;
+  max-width: 500px;
+
+  padding: 10px 15px;
+
+  background: #6cc055;
+  color: #fff;
+
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
+
+  -webkit-transform: translateY(0);
+  -webkit-transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
+}
+.Alert.is-active {
+  opacity: 1;
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
+}
+
+
+
 
 
 
@@ -61,44 +89,21 @@ canvas {
 
   background: #fff;
   border-top: 1px solid #eee;
-  padding: 1em;
-  
-  vertical-align: middle;
+  padding: 15px;
   text-align: center;
-}
-
-.Footer > div {
-  vertical-align: middle;
-  display: inline-block;
-  margin: 0 5%;
-}
-
-.Footer-alert {
-  min-width: 200px;
-  padding: .5em 1em;
-
-  background: #6cc055;
-  color: #fff;
-
-  opacity: 0;
-  transform: translateY(0);
-  transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
-
-  -webkit-transform: translateY(0);
-  -webkit-transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
-}
-.Footer-alert.is-active {
-  opacity: 1;
-  transform: translateY(0);
-  -webkit-transform: translateY(0);
 }
 
 .Footer-score {
   min-width: 200px;
+  margin-bottom: 15px;
 }
 
-.Footer-button {
-  float: right;
+@media (min-width: 600px) {
+  .Footer > div {
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 15px;
+  }
 }
 
 
@@ -116,11 +121,10 @@ canvas {
   position: absolute;
   top: 50%;
   left: 50%;
-
-  z-index: 2;
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
-  
+  z-index: 2;
+
   min-width: 450px;
   text-align: center;
   padding: 2em;
@@ -151,8 +155,6 @@ canvas {
   margin: 0;
   min-width: 150px;
 }
-
-
 .Form input {
   background: #fff;
   color: #111;

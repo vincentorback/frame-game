@@ -9,15 +9,16 @@ html.no-js(lang='en')
 
 
 
+    .Alert.js-alert
+
+
 
     aside.Footer(id='footer')
       .Footer-score
         p Poäng:
           span.js-score  0
-      .Footer-alert.js-alert Hurra du kom med i highscore!
       .Footer-info
         button.Button.js-showDialog Instruktioner
-
 
 
 
@@ -29,15 +30,14 @@ html.no-js(lang='en')
         button.Button(type='submit') Skicka
 
       button.Button.js-playAgain Spela igen
-
     
+
 
     .Dialog.js-dialog(id='dialog' style='display:none')
       .Dialog-info
         h1 Instruktioner
         p Skjut på zombiehipsters!
         p Använd piltangenterna för att röra dig och mellanslag för att skjuta.
-      
       
       .Dialog-highscores
         h2 Top 10 Highscore
@@ -56,7 +56,7 @@ html.no-js(lang='en')
                 td #{score.niceDate}
 
       button.Dialog-close.Button.js-closeDialog Stäng
-
+    
     
 
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js')
