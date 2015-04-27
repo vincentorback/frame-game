@@ -21,6 +21,14 @@ body {
   height: 100%;
 }
 
+body {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+body.is-loaded {
+  opacity: 1;
+}
+
 input,
 button {
   -webkit-appearance: none;
@@ -72,10 +80,10 @@ canvas {
 
   opacity: 0;
   transform: translateY(-40px);
-  transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
+  transition: opacity 500ms ease 500ms, transform 500ms ease 500ms;
 
   -webkit-transform: translateY(-40px);
-  -webkit-transition: opacity 400ms ease 400ms, transform 400ms ease 400ms;
+  -webkit-transition: opacity 500ms ease 500ms, transform 500ms ease 500ms;
 }
 .Alert.is-active {
   opacity: 1;
@@ -106,7 +114,16 @@ canvas {
   border-top: 1px solid #eee;
   padding: 15px;
   text-align: center;
+
+  transform: translateY(100%);
+  transition: transform 500ms ease 2000ms;
 }
+
+.is-loaded .Footer {
+  transform: translateY(0);
+}
+
+
 
 .Footer-playing,
 .Footer-score {

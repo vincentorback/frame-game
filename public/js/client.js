@@ -45,6 +45,7 @@
 
 
   // Let’s get all of them elements!
+  var $body = $(document.body);
   var $score = $('.js-score');
   var $playing = $('.js-playing');
   var $gameOver = $('.js-gameOver');
@@ -94,7 +95,11 @@
   resources.load([
     'images/sprites.png'
   ]);
-  resources.onReady(init);
+  
+  resources.onReady(function () {
+    $body.addClass('is-loaded');
+    init();
+  });
 
 
   /*
