@@ -7,11 +7,6 @@
 
 
 
-
-
-
-
-
   // Game variables
   var player = {
     pos: [0, 0],
@@ -41,9 +36,6 @@
   var winHeight = window.innerHeight;
   var canvasWidth = winWidth;
   var canvasHeight = winHeight;
-
-
-
 
 
 
