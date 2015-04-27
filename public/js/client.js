@@ -545,7 +545,7 @@
 
       $highscoreTable.find('tbody').remove();
       $highscoreTable.append(newHighscore);
-      dialog.showModal();
+      $dialog.show();
     }
   });
 

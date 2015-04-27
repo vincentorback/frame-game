@@ -71,19 +71,21 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 2;
 
   max-width: 500px;
-
   padding: 10px 15px;
-  background: #6cc055;
-  color: #fff;
+
+  background: #fff;
+  background: rgba(255,255,255,.95);
+  color: #6cc055;
 
   opacity: 0;
-  transform: translateY(-40px);
-  transition: opacity 500ms ease 500ms, transform 500ms ease 500ms;
-
   -webkit-transform: translateY(-40px);
+  transform: translateY(-40px);
+
   -webkit-transition: opacity 500ms ease 500ms, transform 500ms ease 500ms;
+  transition: opacity 500ms ease 500ms, transform 500ms ease 500ms;
 }
 .Alert.is-active {
   opacity: 1;
@@ -93,6 +95,9 @@ canvas {
 
 @media (min-width: 600px) {
   .Alert {
+    background: #6cc055;
+    color: #fff;
+
     min-width: 200px;
     top: 15px;
     left: 15px;
@@ -114,9 +119,13 @@ canvas {
   border-top: 1px solid #eee;
   padding: 15px;
   text-align: center;
+}
 
-  transform: translateY(100%);
-  transition: transform 500ms ease 2000ms;
+@media (min-width: 600px) {
+  .Footer {
+    transform: translateY(100%);
+    transition: transform 500ms ease 2000ms;
+  }
 }
 
 .is-loaded .Footer {
@@ -191,11 +200,12 @@ canvas {
   border-radius: 0;
   margin: 0;
   min-width: 150px;
+  padding: 1em 2em;
 }
 .Form input {
   background: #fff;
   color: #111;
-  padding: 1em 2em;
+  padding: 1em;
 }
 
 ::-webkit-input-placeholder {
