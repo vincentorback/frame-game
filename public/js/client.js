@@ -46,6 +46,7 @@
 
   // Let’s get all of them elements!
   var $score = $('.js-score');
+  var $playing = $('.js-playing');
   var $gameOver = $('.js-gameOver');
   var $form = $('#highschore-form');
   var $formName = $('#highschore-name');
@@ -495,8 +496,9 @@
     totalReadingTime = Math.floor(totalWords / wordsPerMillisecond);
     totalReadingTime = (totalReadingTime > 6000) ? totalReadingTime : 6000;
 
-    $alert.html(message);
-    $alert.addClass('is-active');
+    $alert
+      .html(message)
+      .addClass('is-active');
 
     window.setTimeout(function () {
       $alert.removeClass('is-active');
@@ -512,7 +514,7 @@
   if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
     showAlert('Sorry! Det här spelet funkar bara på datorer just nu!');
   } else {
-    showAlert('Spring med piltangenterna och skjut med mellanslag!')
+    showAlert('Spring med piltangenterna och skjut med mellanslag!');
   }
 
 
@@ -542,8 +544,12 @@
     }
   });
 
-  socket.on('test', function (data) {
-    console.log(data);
+  socket.on('updateUsers', function (data) {
+    if (data.length > 1) {
+      $playing.html(data.length + ' personer spelar just nu');
+    } else {
+      $playing.empty();
+    }
   });
 
 }(this));

@@ -91,10 +91,20 @@ app.use('/', function (req, res) {
 
 
 var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+var users = [];
 
 // Set up web sockets
 var io = require('socket.io').listen(app.listen(app.get('port')));
 io.sockets.on('connection', function (socket) {
+
+  users.push(socket.id); 
+
+  io.sockets.emit('updateUsers', users);
+
+  socket.on('disconnect', function() {
+    users.splice(users.indexOf(socket.id), 1);
+    io.sockets.emit('updateUsers', users);
+  });
 
   socket.on('savescore', function (scoreData) {
     var date = new Date(),
