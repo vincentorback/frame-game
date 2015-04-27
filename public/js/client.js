@@ -4,9 +4,6 @@
 
 
 
-  if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-    alert('Sorry! Det här spelet funkar bara på datorer just nu!');
-  }
 
 
 
@@ -482,6 +479,52 @@
   });
 
 
+  /*
+  # Average word per minute
+  Third-grade students = 150
+  Eight grade students = 250
+  Average college student = 450
+  Average “high level exec” = 575
+  Average college professor = 675
+  Speed readers = 1,500
+  World speed reading champion = 4,700
+  Average adult: 300
+  */
+  function showAlert(message) {
+    var totalWords,
+      wordsPerMillisecond,
+      totalReadingTime,
+      wordsPerMinute = 250,
+      messageTest;
+
+    messageTest = message.replace(/<\/?[^>]+(>|$)/g, ''); // Remove any HTML-tags
+    totalWords = messageTest.split(/\s+/g).length; // Split up in words
+    wordsPerMillisecond = wordsPerMinute / 60000;
+    totalReadingTime = Math.floor(totalWords / wordsPerMillisecond);
+    totalReadingTime = (totalReadingTime > 6000) ? totalReadingTime : 6000;
+
+    $alert.html(message);
+    $alert.addClass('is-active');
+
+    window.setTimeout(function () {
+      $alert.removeClass('is-active');
+    }, totalReadingTime);
+  }
+
+
+
+
+
+
+
+  if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+    showAlert('Sorry! Det här spelet funkar bara på datorer just nu!');
+  } else {
+    showAlert('Spring med piltangenterna och skjut med mellanslag!')
+  }
+
+
+
 
 
 
@@ -490,8 +533,8 @@
   
   // Show alert messages and update highscores
   socket.on('alert', function (data) {
-    $alert.html(data.message);
-    $alert.addClass('is-active');
+
+    showAlert(data.message);
 
     var newHighscore = '<tbody>';
 
@@ -505,10 +548,6 @@
       $highscoreTable.append(newHighscore);
       dialog.showModal();
     }
-
-    window.setTimeout(function () {
-      $alert.removeClass('is-active');
-    }, 10000);
   });
 
   socket.on('test', function (data) {
