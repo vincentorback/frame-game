@@ -5,6 +5,36 @@
 
 
 
+  // Game size
+  var winWidth = window.innerWidth;
+  var winHeight = window.innerHeight;
+  var canvasWidth = winWidth;
+  var canvasHeight = winHeight;
+
+
+  // Create the canvas
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+
+  if (winWidth > 600 && winHeight > 600) {
+    canvasWidth = 500;
+    canvasHeight = 500;
+    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
+  } else {
+    canvas.style.bottom = (document.getElementById('footer').offsetHeight * 2) + 'px';
+  }
+  
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  document.body.appendChild(canvas);
+
+
+
+
+  
+
+
+
 
 
   // Game variables
@@ -31,11 +61,10 @@
   var enemySpeed = 100;
   var tokenSpeed = 50;
 
-  // Game size
-  var winWidth = window.innerWidth;
-  var winHeight = window.innerHeight;
-  var canvasWidth = winWidth;
-  var canvasHeight = winHeight;
+  
+
+
+
 
 
 
@@ -67,21 +96,6 @@
 
 
 
-  // Create the canvas
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d');
-
-  if (winWidth > 600 && winHeight > 600) {
-    canvasWidth = 500;
-    canvasHeight = 500;
-    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
-  } else {
-    canvas.style.bottom = (document.getElementById('footer').offsetHeight * 2) + 'px';
-  }
-  
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-  document.body.appendChild(canvas);
 
 
 
@@ -331,7 +345,6 @@
 
       if (boxCollides(pos, size, player.pos, player.sprite.size)) {
         if (!isGameOver) {
-
           gameOver();
         }
       }

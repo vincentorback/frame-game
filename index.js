@@ -58,6 +58,14 @@ app.use(session({
 
 
 
+
+
+// Render styles
+app.use(require('./controllers/styles'));
+
+
+
+
 // API call to get current highscore
 app.get('/api/highscore', function (req, res) {
   // Get posts from database.
@@ -101,10 +109,9 @@ io.sockets.on('connection', function (socket) {
 
   io.sockets.emit('updateUsers', users);
 
-  socket.on('disconnect', function() {
-    users.splice(users.indexOf(socket.id), 1);
-    io.sockets.emit('updateUsers', users);
-  });
+
+
+
 
   socket.on('savescore', function (scoreData) {
     var date = new Date(),
@@ -147,6 +154,15 @@ io.sockets.on('connection', function (socket) {
         });
       }
     });
-
   });
+
+
+
+
+
+  socket.on('disconnect', function() {
+    users.splice(users.indexOf(socket.id), 1);
+    io.sockets.emit('updateUsers', users);
+  });
+
 });
