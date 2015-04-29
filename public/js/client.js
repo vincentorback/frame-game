@@ -4,26 +4,71 @@
 
 
 
+  // Game size
+  var winWidth = window.innerWidth;
+  var winHeight = window.innerHeight;
+  var canvasWidth = (winWidth > 1000) ? 1000 : winWidth;
+  var canvasHeight = (winHeight > 600) ? 600 : winHeight;
+
+  // Create the canvas
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  document.body.appendChild(canvas);
 
 
 
-  // Game variables
-  var player = {
-    pos: [0, 0],
-    sprite: new Sprite('images/sprites.png', [0, 0], [22, 44], 12, [2, 3, 4, 5, 6, 7, 0, 1])
+  
+  var Player = function (startX, startY) {
+    this.x = startX;
+    this.y = startY;
+    this.sprite = new Sprite('images/sprites.png', [0, 0], [22, 44], 12, [2, 3, 4, 5, 6, 7, 0, 1]),
+    this.powerUp = false;
+    this.dead = false;
   };
 
+  var Bullet = function (startX, startY, dir) {
+    this.x = startX;
+    this.y = startY;
+    this.sprite = new Sprite('images/sprites.png', [5, 137], [12, 12]);
+    this.dir = dir || 'up';
+  };
+
+  var Enemy = function (startX, startY) {
+    this.x = startX;
+    this.y = startY;
+    this.sprite = new Sprite('images/sprites.png', [0, 66], [22, 44], 22, [1, 0, 7, 6, 5, 4, 3, 2]);
+  };
+
+  var Token = function (startX, startY) {
+    this.x = startX;
+    this.y = startY;
+    this.sprite = new Sprite('images/sprites.png', [2, 156], [18, 18], 1, [0])
+  };
+
+  var Explosion = function (startX, startY) {
+    this.x = startX;
+    this.y = startY;
+    this.sprite = new Sprite('images/sprites.png', [22, 132], [22, 22], 22, [0, 1, 2], null, true);
+  };
+
+
+
+  var localPlayer;
+  var remotePlayers = [];
   var bullets = [];
+  var remoteBullets = [];
   var enemies = [];
-  var tokens = [];
   var explosions = [];
+  var tokens = [];
 
   var lastFire = Date.now();
   var gameTime = 0;
   var isGameOver;
 
-  var score = 0;
-  var hasPowerUp = false;
+  var localScore = 0;
+  var globalScore = 0;
 
   // Speed in pixels per second
   var playerSpeed = 200;
@@ -31,13 +76,7 @@
   var enemySpeed = 100;
   var tokenSpeed = 50;
 
-  // Game size
-  var winWidth = window.innerWidth;
-  var winHeight = window.innerHeight;
-  var canvasWidth = winWidth;
-  var canvasHeight = winHeight;
-
-
+  var soundOn = true;
 
 
 
@@ -46,42 +85,33 @@
 
   // Let’s get all of them elements!
   var $body = $(document.body);
-  var $score = $('.js-score');
-  var $playing = $('.js-playing');
-  var $gameOver = $('.js-gameOver');
-  var $form = $('#highschore-form');
-  var $formName = $('#highschore-name');
 
+  var $alert = $('.js-alert');
+
+  var $localScore = $('.js-localScore');
+  var $globalScore = $('.js-globalScore');
+
+  var $online = $('.js-online');
+  var $gameOver = $('.js-gameOver');
+  
   var $dialog = $('.js-dialog');
   var $showDialog = $('.js-showDialog');
   var $closeDialog = $('.js-closeDialog');
 
   var $playButton = $('.js-playButton');
+  var $resetButton = $('.js-resetButton');
 
-  var $alert = $('.js-alert');
+  var $form = $('#highschore-form');
+  var $formName = $('#highschore-name');
   var $highscoreTable = $('#highscore-table');
 
+  var $soundToggle = $('.js-soundToggle');
 
 
 
 
 
 
-  // Create the canvas
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d');
-
-  if (winWidth > 600 && winHeight > 600) {
-    canvasWidth = 500;
-    canvasHeight = 500;
-    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
-  } else {
-    canvas.style.bottom = (document.getElementById('footer').offsetHeight * 2) + 'px';
-  }
-  
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-  document.body.appendChild(canvas);
 
 
 
@@ -95,11 +125,54 @@
   resources.load([
     'images/sprites.png'
   ]);
-  
   resources.onReady(function () {
     $body.addClass('is-loaded');
-    init();
   });
+
+
+  var successSound = new Howl({
+    urls: ['../audio/success.wav']
+  });
+
+  var laserSound = new Howl({
+    urls: ['../audio/laser.wav'],
+    volume: 0.1
+  });
+
+  var powerSound = new Howl({
+    urls: ['../audio/power-up.wav']
+  });
+
+  var scoreSound = new Howl({
+    urls: ['../audio/coin.wav']
+  });
+
+
+
+
+  $soundToggle.on('click', function () {
+    if (soundOn) {
+      soundOn = false;
+      Howler.mute();
+      $soundToggle.removeClass('is-active');
+    } else {
+      soundOn = true;
+      Howler.unmute();
+      $soundToggle.addClass('is-active');
+    }
+  });
+
+
+
+
+  // Set up websocket connection
+  var socket = io.connect();
+
+
+
+
+
+
 
 
   /*
@@ -111,7 +184,7 @@
 
   This is achieved by calculating the time since last update (in seconds),
   and expressing all movements in pixels/second units.
-  Movement then becomes x += 50 * dt, or "50 pixels per second".
+  Movement then becomes x += 50 * dt, or '50 pixels per second'.
   */
   var lastTime;
   function main() {
@@ -126,13 +199,46 @@
   }
 
 
+
+
+  // Reset game to original state
+  function reset() {
+    $gameOver.hide();
+
+    isGameOver = false;
+    gameTime = 0;
+
+    localScore = 0;
+    globalScore = 0;
+
+    localPlayer.dead = false;
+
+    $localScore.text(localScore);
+    $globalScore.text(globalScore);
+
+    remotePlayers = [];
+    remoteBullets = [];
+    enemies = [];
+    bullets = [];
+    tokens = [];
+  }
+
+
+
+
   // Initialize the game
   function init() {
-    $playButton.on('click', reset);
+    localPlayer = new Player(Math.random() * (canvasWidth - 22), (canvasHeight - 44));
+    localPlayer.id = socket.id;
+
+    socket.emit('new player', localPlayer);
 
     reset();
     lastTime = Date.now();
     main();
+
+    $body.addClass('is-playing');
+    showAlert('Spring med piltangenterna och skjut med mellanslag!');
   }
 
 
@@ -142,71 +248,97 @@
 
     handleInput(dt);
     updateEntities(dt);
-
-    // It gets harder over time by adding enemies using this equation: 1-.993^gameTime
-    if (Math.random() < 1 - Math.pow(.993, gameTime)) {
-      enemies.push({
-        pos: [canvasWidth, Math.random() * (canvasHeight - 44)],
-        sprite: new Sprite('images/sprites.png', [0, 66], [22, 44], 22, [1, 0, 7, 6, 5, 4, 3, 2])
-      });
-    }
-
-    // Tokens appear less frequest
-    if (Math.random() < 1 - Math.pow(.9998, gameTime)) {
-      tokens.push({
-        pos: [canvasWidth, Math.random() * (canvasHeight - 18)],
-        sprite: new Sprite('images/sprites.png', [2, 156], [18, 18], 1, [0])
-      });
-    }
-
     checkCollisions();
-
-    $score.text(' ' + score);
-  };
+  }
 
 
   // Handle all inputs
   // in `js/input.js` you’ll find the helpers
   function handleInput(dt) {
+    if (localPlayer.dead === true) {
+      return;
+    }
+
     if (input.isDown('DOWN') || input.isDown('s')) {
-      player.pos[1] += playerSpeed * dt;
+      localPlayer.y += playerSpeed * dt;
+      socket.emit('move player', {
+        y: localPlayer.y,
+        x: localPlayer.x
+      });
     }
 
     if (input.isDown('UP') || input.isDown('w')) {
-      player.pos[1] -= playerSpeed * dt;
+      localPlayer.y -= playerSpeed * dt;
+      socket.emit('move player', {
+        y: localPlayer.y,
+        x: localPlayer.x
+      });
     }
 
     if (input.isDown('LEFT') || input.isDown('a')) {
-      player.pos[0] -= playerSpeed * dt;
+      localPlayer.x -= playerSpeed * dt;
+      socket.emit('move player', {
+        y: localPlayer.y,
+        x: localPlayer.x
+      });
     }
 
     if (input.isDown('RIGHT') || input.isDown('d')) {
-      player.pos[0] += playerSpeed * dt;
+      localPlayer.x += playerSpeed * dt;
+      socket.emit('move player', {
+        y: localPlayer.y,
+        x: localPlayer.x
+      });
     }
 
     if (input.isDown('SPACE') && !isGameOver && Date.now() - lastFire > 100) {
-      var x = player.pos[0] + player.sprite.size[0] / 2;
-      var y = player.pos[1] + player.sprite.size[1] / 2;
+      var x = localPlayer.x + localPlayer.sprite.size[0] / 2;
+      var y = localPlayer.y + localPlayer.sprite.size[1] / 2;
 
-      bullets.push({
-        pos: [x, y],
-        dir: 'forward',
-        sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
-      });
+      if (localPlayer.powerUp === true) {
+        var upBullet = new Bullet(x, y, 'up');
+        var rightBullet = new Bullet(x, y, 'left');
+        var leftBullet = new Bullet(x, y, 'right');
 
-      if (hasPowerUp) {
-        bullets.push({
-          pos: [x, y],
-          dir: 'up',
-          sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
+        upBullet.id = _.uniqueId('bullet_');
+        rightBullet.id = _.uniqueId('bullet_');
+        leftBullet.id = _.uniqueId('bullet_');
+
+        socket.emit('new bullet', {
+          y: y,
+          x: x
+          id: upBullet.id
         });
 
-        bullets.push({
-          pos: [x, y],
-          dir: 'down',
-          sprite: new Sprite('images/sprites.png', [5, 137], [12, 12])
+        socket.emit('new bullet', {
+          y: y,
+          x: x,
+          id: rightBullet.id
         });
+
+        socket.emit('new bullet', {
+          y: y,
+          x: x,
+          id: leftBullet.id
+        });
+
+        bullets.push(upBullet, rightBullet, leftBullet);
+
+      } else {
+        var newBullet = new Bullet(x, y);
+
+        newBullet.id = _.uniqueId('bullet_');
+
+        socket.emit('new bullet', {
+          y: y,
+          x: x,
+          id: newBullet.id
+        });
+
+        bullets.push(newBullet);
       }
+      
+      laserSound.play();
 
       lastFire = Date.now();
     }
@@ -218,33 +350,51 @@
 
   function updateEntities(dt) {
     // Update the player sprite animation
-    player.sprite.update(dt);
+    if (localPlayer.dead === false) {
+      localPlayer.sprite.update(dt);
+    }
 
     // Update all bullet
-    for (var i = 0; i < bullets.length; i += 1) {
+    var i = 0;
+    for (i; i < bullets.length; i += 1) {
       var bullet = bullets[i];
 
-      switch(bullet.dir) {
-        case 'up': bullet.pos[1] -= bulletSpeed * dt; break;
-        case 'down': bullet.pos[1] += bulletSpeed * dt; break;
-        default: bullet.pos[0] += bulletSpeed * dt;
-      }
+      bullet.y -= bulletSpeed * dt; // Go upwards!
 
       // Remove the bullet if it goes offscreen
-      if (bullet.pos[1] < 0 || bullet.pos[1] > canvasHeight || bullet.pos[0] > canvasWidth) {
+      if (bullet.y < 0 || bullet.y > canvasHeight || bullet.x > canvasWidth) {
         bullets.splice(i, 1);
         i--;
       }
     }
 
 
+
+    // Update all bullet
+    var i = 0;
+    for (i; i < remoteBullets.length; i += 1) {
+      var bullet = remoteBullets[i];
+
+      bullet.y -= bulletSpeed * dt; // Go upwards!
+
+      // Remove the bullet if it goes offscreen
+      if (bullet.y < 0 || bullet.y > canvasHeight || bullet.x > canvasWidth) {
+        remoteBullets.splice(i, 1);
+        i--;
+      }
+    }
+
+
+
+
     // Update all enemies
-    for (var i = 0; i < enemies.length; i += 1) {
-      enemies[i].pos[0] -= enemySpeed * dt;
+    var i = 0;
+    for (i; i < enemies.length; i += 1) {
+      enemies[i].y += enemySpeed * dt;
       enemies[i].sprite.update(dt);
 
       // Remove if offscreen
-      if (enemies[i].pos[0] + enemies[i].sprite.size[0] < 0) {
+      if (enemies[i].y + enemies[i].sprite.size[0] > canvasHeight) {
         enemies.splice(i, 1);
         i--;
       }
@@ -252,13 +402,18 @@
 
 
 
+
+
+
+
     // Update all token
-    for (var i = 0; i < tokens.length; i += 1) {
-      tokens[i].pos[0] -= tokenSpeed * dt;
+    var i = 0;
+    for (i; i < tokens.length; i += 1) {
+      tokens[i].y += tokenSpeed * dt;
       tokens[i].sprite.update(dt);
 
       // Remove if offscreen
-      if (tokens[i].pos[0] + tokens[i].sprite.size[0] < 0) {
+      if (tokens[i].y + tokens[i].sprite.size[0] > canvasHeight) {
         tokens.splice(i, 1);
         i--;
       }
@@ -266,8 +421,13 @@
 
 
 
+
+
+
+
     // Update all explosions
-    for (var i = 0; i < explosions.length; i += 1) {
+    var i = 0;
+    for (i; i < explosions.length; i += 1) {
       explosions[i].sprite.update(dt);
 
       // Remove if animation is done
@@ -286,42 +446,54 @@
     return !(r <= x2 || x > r2 || b <= y2 || y > b2);
   }
 
-  function boxCollides(pos, size, pos2, size2) {
+  function boxCollides(x, y, size, x2, y2, size2) {
     return collides(
-      pos[0], pos[1],
-      pos[0] + size[0], pos[1] + size[1],
-      pos2[0], pos2[1],
-      pos2[0] + size2[0], pos2[1] + size2[1]
+      x, y,
+      x + size[0], y + size[1],
+      x2, y2,
+      x2 + size2[0], y2 + size2[1]
     );
   }
+
 
   var tokenTimeout;
 
   function checkCollisions() {
     checkPlayerBounds();
-    
+
     // Run collision detection for all enemies and bullets
     for (var i = 0; i < enemies.length; i += 1) {
-      var pos = enemies[i].pos;
-      var size = enemies[i].sprite.size;
+      var x = enemies[i].x;
+      var y = enemies[i].y;
+      var enemySize = enemies[i].sprite.size;
 
       for (var j = 0; j < bullets.length; j += 1) {
-        var pos2 = bullets[j].pos;
-        var size2 = bullets[j].sprite.size;
+        var x2 = bullets[j].x;
+        var y2 = bullets[j].y;
+        var bulletSize = bullets[j].sprite.size;
 
-        if (boxCollides(pos, size, pos2, size2)) {
+        if (boxCollides(x, y, enemySize, x2, y2, bulletSize)) {
+
+          socket.emit('enemy shot', {
+            enemyID: enemies[i].id,
+            bulletID: bullets[j].id,
+            x: x,
+            y: y
+          });
+
           // Remove the enemy
           enemies.splice(i, 1);
           i--;
 
-          // Add score
-          score += 100;
+          localScore += 100;
+          $localScore.text(localScore);
+
+          var newExplosion = new Explosion(x, y);
 
           // Add an explosion
-          explosions.push({
-            pos: pos,
-            sprite: new Sprite('images/sprites.png', [22, 132], [22, 22], 16, [0, 1, 2], null, true)
-          });
+          explosions.push(newExplosion);
+
+          scoreSound.play();
 
           // Remove the bullet and stop this iteration
           bullets.splice(j, 1);
@@ -329,47 +501,62 @@
         }
       }
 
-      if (boxCollides(pos, size, player.pos, player.sprite.size)) {
-        if (!isGameOver) {
-
-          gameOver();
+      if (boxCollides(x, y, enemySize, localPlayer.x, localPlayer.y, localPlayer.sprite.size)) {
+        if (!isGameOver && (localPlayer.dead === false)) {
+          socket.emit('player dead', {
+            id: localPlayer.id
+          });
+          localPlayer.dead = true;
+          localGameOver();
         }
       }
     }
 
 
-    // Run collision detection for all enemies and bullets
-    for (var i = 0; i < tokens.length; i += 1) {
-      var pos = tokens[i].pos;
-      var size = tokens[i].sprite.size;
 
-      if (boxCollides(pos, size, player.pos, player.sprite.size)) {
+
+    // Run collision detection for all enemies and bullets
+    var i = 0;
+    for (i; i < tokens.length; i += 1) {
+      var x = tokens[i].x;
+      var y = tokens[i].y;
+      var tokenSize = tokens[i].sprite.size;
+
+      if (boxCollides(x, y, tokenSize, localPlayer.x, localPlayer.y, localPlayer.sprite.size)) {
         // Remove the token and stop this iteration
         tokens.splice(i, 1);
 
-        hasPowerUp = true;
-        player.sprite.speed = 24;
+        clearTimeout(tokenTimeout);
+
+        localPlayer.powerUp = true;
+        localPlayer.sprite.speed = 24;
         tokenTimeout = setTimeout(function () {
-          hasPowerUp = false;
-          player.sprite.speed = 12;
+          localPlayer.powerUp = false;
+          localPlayer.sprite.speed = 12;
         }, 5000);
       }
     }
 
+
+
   }
 
   function checkPlayerBounds() {
-    // Check bounds
-    if (player.pos[0] < 0) {
-      player.pos[0] = 0;
-    } else if (player.pos[0] > canvasWidth - player.sprite.size[0]) {
-      player.pos[0] = canvasWidth - player.sprite.size[0];
+    if (localPlayer.dead === true) {
+      return;
     }
 
-    if (player.pos[1] < 0) {
-      player.pos[1] = 0;
-    } else if (player.pos[1] > canvasHeight - player.sprite.size[1]) {
-      player.pos[1] = canvasHeight - player.sprite.size[1];
+    // Check bounds
+    if (localPlayer.x < 0) {
+      localPlayer.x = 0;
+    } else if (localPlayer.x > canvasWidth - localPlayer.sprite.size[0]) {
+      localPlayer.x = canvasWidth - localPlayer.sprite.size[0];
+    }
+
+    if (localPlayer.y < 0) {
+      localPlayer.y = 0;
+    } else if (localPlayer.y > canvasHeight - localPlayer.sprite.size[1]) {
+      localPlayer.y = canvasHeight - localPlayer.sprite.size[1];
     }
   }
 
@@ -380,11 +567,13 @@
     ctx.fillStyle = '#6cc055';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Render the player if the game isn't over
-    if (!isGameOver) {
-      renderEntity(player);
+    // Render the localPlayer if the game isn't over
+    if (!isGameOver && (localPlayer.dead === false)) {
+      renderEntity(localPlayer);
     }
 
+    renderEntities(remotePlayers);
+    renderEntities(remoteBullets);
     renderEntities(bullets);
     renderEntities(enemies);
     renderEntities(tokens);
@@ -399,7 +588,7 @@
 
   function renderEntity(entity) {
     ctx.save();
-    ctx.translate(entity.pos[0], entity.pos[1]);
+    ctx.translate(entity.x, entity.y);
     entity.sprite.render(ctx);
     ctx.restore();
   }
@@ -414,25 +603,21 @@
 
 
   // Game over
-  function gameOver() {
-    $gameOver.show();
-    $form.show();
+  function localGameOver() {
     isGameOver = true;
+    showAlert('Aww shoot you died!');
   }
 
-  // Reset game to original state
-  function reset() {
-    $gameOver.hide();
+  function globalGameOver() {
+    $gameOver.show();
+    // $form.show();
+    isGameOver = true;
 
-    isGameOver = false;
-    gameTime = 0;
-    score = 0;
+    $body.removeClass('is-playing');
 
-    enemies = [];
-    tokens = [];
-    bullets = [];
+    successSound.play();
 
-    player.pos = [5, canvasHeight - 44];
+    showAlert('Game over! You scored ' + localScore + ' points and your team scored ' + globalScore + ' points!');
   }
 
 
@@ -443,8 +628,7 @@
 
 
 
-  // Set up websocket connection
-  var socket = io.connect();
+
 
 
 
@@ -452,9 +636,9 @@
 
   // Highscore form
   $form.on('submit', function (event) {
-    socket.emit('savescore', {
+    socket.emit('submit score', {
       name: $formName.val(),
-      score: score
+      score: localScore
     });
 
     $form.hide();
@@ -477,6 +661,9 @@
   });
 
 
+
+
+
   /*
   # Average word per minute
   Third-grade students = 150
@@ -488,25 +675,35 @@
   World speed reading champion = 4,700
   Average adult: 300
   */
+  var alerts = 0;
+
+  // Notification.requestPermission();
+
   function showAlert(message) {
     var totalWords,
       wordsPerMillisecond,
       totalReadingTime,
       wordsPerMinute = 250,
-      messageTest;
+      messageTest,
+      messageID = _.uniqueId('alert_');
 
     messageTest = message.replace(/<\/?[^>]+(>|$)/g, ''); // Remove any HTML-tags
     totalWords = messageTest.split(/\s+/g).length; // Split up in words
     wordsPerMillisecond = wordsPerMinute / 60000;
     totalReadingTime = Math.floor(totalWords / wordsPerMillisecond);
-    totalReadingTime = (totalReadingTime > 6000) ? totalReadingTime : 6000;
+    totalReadingTime = (totalReadingTime > 10000) ? totalReadingTime : 10000;
 
-    $alert
-      .html(message)
-      .addClass('is-active');
+    console.log(message);
 
-    window.setTimeout(function () {
-      $alert.removeClass('is-active');
+    // var notification = new Notification('Daytona Zombie Challenge', {
+    //   dir: 'rtl',
+    //   body: message,
+    //   tag: messageID,
+    //   icon: 'images/icon.png'
+    // });
+
+    _.delay(function () {
+      // notification.close();
     }, totalReadingTime);
   }
 
@@ -516,10 +713,27 @@
 
 
 
-  if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-    showAlert('Sorry! Det här spelet funkar bara på datorer just nu!');
-  } else {
-    showAlert('Spring med piltangenterna och skjut med mellanslag!');
+  $playButton.on('click', function () {
+    socket.emit('start game');
+  });
+
+  $resetButton.on('click', reset);
+
+
+
+
+
+
+
+  // Get players, bullet, enemy etc by ID
+  function characterById(id, list) {
+    var i;
+    for (i = 0; i < list.length; i += 1) {
+      if (list[i].id === id) {
+        return list[i];
+      }
+    }
+    return false;
   }
 
 
@@ -527,34 +741,121 @@
 
 
 
-
-  // Socket events
-  
-  // Show alert messages and update highscores
-  socket.on('alert', function (data) {
-
-    showAlert(data.message);
-
-    var newHighscore = '<tbody>';
-
-    if (data.openDialog) {
-      for (var i = 0; i < data.highscore.length; i += 1) {
-        newHighscore += '<tr><td>' + data.highscore[i].name + '</td><td>' + data.highscore[i].score + '</td><td>' + data.highscore[i].niceDate + '</td></tr>';
-      }
-      newHighscore += '</tobdy>';
-
-      $highscoreTable.find('tbody').remove();
-      $highscoreTable.append(newHighscore);
-      $dialog.show();
-    }
+  // Emit that a new player has joined
+  socket.on('connect', function () {
+    
   });
 
-  socket.on('updateUsers', function (data) {
-    if (data.length > 1) {
-      $playing.html(data.length + ' personer spelar just nu');
+
+
+  socket.on('disconnect', function () {
+    console.log('Disconnected from socket server...');
+    showAlert('Looks the server crashed...');
+  });
+
+
+
+  socket.on('start game', function () {
+    init();
+  });
+
+
+
+  socket.on('game over', globalGameOver);
+
+
+
+  socket.on('new player', function (data) {
+    if (characterById(data.id, remotePlayers)) {
+      console.log('this player already exists!');
     } else {
-      $playing.empty();
+      var newPlayer = new Player(data.x, data.y);
+      newPlayer.id = data.id;
+      remotePlayers.push(newPlayer);
     }
   });
+
+
+
+  socket.on('move player', function (data) {
+    var movePlayer = characterById(data.id, remotePlayers);
+
+    if (!movePlayer) {
+      console.log('Player to move not found: ' + data.id);
+      return;
+    }
+
+    movePlayer.x = data.x;
+    movePlayer.y = data.y;
+  });
+
+
+
+  socket.on('new enemy', function (data) {
+    var newEnemy = new Enemy(data.x, data.y);
+    newEnemy.id = data.id;
+    enemies.push(newEnemy);
+  });
+
+
+
+  socket.on('new bullet', function (data) {
+    var newBullet = new Bullet(data.x, data.y);
+    newBullet.id = data.id;
+    remoteBullets.push(newBullet);
+  });
+
+
+
+  socket.on('enemy shot', function (data) {
+    var newExplosion = new Explosion(data.x, data.y);
+    explosions.push(newExplosion);
+
+    var removeBullet = characterById(data.bulletID, remoteBullets);
+    var removeEnemy = characterById(data.enemyID, enemies);
+
+    remoteBullets.splice(remoteBullets.indexOf(removeEnemy), 1);
+    enemies.splice(enemies.indexOf(removeEnemy), 1);
+  });
+
+
+
+  socket.on('update score', function (data) {
+    globalScore = data;
+
+    $localScore.text(localScore);
+    $globalScore.text(globalScore);
+  });
+
+
+
+  socket.on('player dead', function (data) {
+    var deadPlayer = characterById(data.id, remotePlayers);
+
+    if (!deadPlayer) {
+      console.log('Dead player to move not found: ' + data.id);
+      return;
+    }
+
+    remotePlayers.splice(remotePlayers.indexOf(deadPlayer), 1);
+
+    showAlert('Player-' + data.id + ' died!');
+  });
+
+
+
+  socket.on('remove player', function (data) {
+    console.log('Player disconnected, removing: ' + data.id);
+    var removePlayer = characterById(data.id, remotePlayers);
+
+    if (!removePlayer) {
+      console.log('Player to remove not found: ' + data.id);
+      return;
+    }
+
+    remotePlayers.splice(remotePlayers.indexOf(removePlayer), 1);
+  });
+
+
 
 }(this));

@@ -1,0 +1,453 @@
+:root {
+  --color-green: #6cc055;
+  --color-green-active: #5fa94b;
+
+  --color-text: #222;
+  --color-gray: #eee;
+}
+
+
+
+* {
+  box-sizing: border-box;
+  font-family: monospace;
+  font-size: 100%;
+  line-height: 1.5;
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+  height: 100%;
+  max-height: 100%;
+}
+
+body {
+  position: relative;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+body.is-loaded {
+  opacity: 1;
+}
+
+a,
+label,
+button {
+  cursor: pointer;
+  outline: none;
+}
+
+input,
+button {
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 0;
+
+  opacity: 0;
+  transition: opacity 300ms ease 300ms;
+}
+
+.is-playing canvas {
+  opacity: 1;
+}
+
+
+
+.Button {
+  background: var(--color-green);
+  color: #fff;
+  padding: 1em 2em;
+  border-radius: 2em;
+  cursor: pointer;
+
+  transition: background 200ms ease;
+}
+
+.Button:hover,
+.Button:active {
+  outline: none;
+  background: var(--color-green-active);
+}
+
+
+
+
+
+
+.Intro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 10;
+
+  opacity: 0;
+  transition: all 300ms ease 300ms;
+
+  text-align: center;
+}
+.is-loaded .Intro {
+  opacity: 1;
+}
+
+.Intro-inner {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80%;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.Intro-button {
+  transition: all 500ms ease 4500ms;
+  opacity: 0;
+  margin-top: 100px;
+  font-size: 1.5vw;
+  border-radius: 4vw;
+  transform: translateY(40px);
+}
+.Intro-button:hover {
+  transition-delay: 0;
+}
+
+.Intro-logo {
+  width: 100%;
+  margin: 0 auto;
+
+  background: transparent no-repeat 50% 50% / contain;
+  opacity: 0;
+
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.Intro-logo--daytona {
+  width: 100%;
+  min-width: 400px;
+  height: 0;
+  padding-bottom: 30%;
+
+  background-image: url('../images/logo.svg');
+
+  transform: translateY(-20px);
+  transition: all 800ms ease 500ms;
+}
+.Intro-logo--zombie {
+  position: absolute;
+  top: 11%;
+  right: 7%;
+  width: 45%;
+
+  min-width: 400px;
+  height: 0;
+  padding-bottom: 30%;
+
+  background-image: url('../images/logo2.svg');
+  
+  transform: translateY(40px);
+  transition: all 2000ms ease 2000ms;
+}
+
+
+
+.is-loaded .Intro-logo--daytona,
+.is-loaded .Intro-logo--zombie,
+.is-loaded .Intro-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.is-playing .Intro {
+  transition: all 2000ms ease;
+  transform: translateY(100vh);
+  opacity: 0;
+}
+
+
+
+
+
+
+
+
+.Alert {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+
+  max-width: 500px;
+}
+
+.Alert-item {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+
+  padding: 10px 15px;
+
+  background: #fff;
+  background: rgba(255,255,255,.95);
+  color: var(--color-green);
+
+  animation: alertFadeIn 600ms ease 1;
+}
+
+@media (min-width: 600px) {
+  .Alert {
+    min-width: 500px;
+  }
+
+  .Alert-item {
+    background: var(--color-green);
+    color: #fff;
+  }
+}
+
+
+@keyframes alertFadeIn {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.Footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9;
+
+  background: #fff;
+  border-top: 1px solid var(--color-gray);
+  padding: 15px;
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .Footer {
+    transform: translateY(100%);
+    transition: transform 500ms ease 1000ms;
+  }
+}
+
+.is-playing .Footer {
+  transform: translateY(0);
+}
+
+
+
+.Footer-playing,
+.Footer-score {
+  margin-bottom: 15px;
+}
+
+.Footer-score {
+  min-width: 200px;
+}
+
+@media (min-width: 600px) {
+  .Footer > div {
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 15px;
+  }
+}
+
+
+
+
+
+
+
+.GameOver {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  
+  max-width: 450px;
+  width: 95%;
+
+  text-align: center;
+  padding: 15px;
+
+  background: #fff;
+  background: rgba(255,255,255,.9);
+}
+.GameOver h1 {
+  font-size: 2em;
+}
+.GameOver button {
+  margin-top: 1em;
+}
+
+@media (min-width: 600px) {
+  .GameOver {
+    min-width: 450px;
+  }
+}
+
+
+
+
+
+
+.Form {
+  margin: 1em 0;
+}
+.Form input,
+.Form button {
+  border-radius: 0;
+  margin: 0;
+  min-width: 150px;
+  padding: 1em 2em;
+}
+.Form input {
+  background: #fff;
+  color: var(--color-text);
+  padding: 1em;
+}
+
+::placeholder {
+   color: var(--color-text);
+}
+
+
+
+
+
+
+.Dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 99;
+
+  transform: translate(-50%, -50%);
+
+  width: 80%;
+  max-width: 600px;
+  margin: 0 auto;
+  
+  padding: 30px;
+  border: 5px solid var(--color-text);
+  background: white;
+  color: black;
+}
+
+.Dialog h1 {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.Dialog h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.Dialog-highscores {
+  margin-top: 1em;
+}
+
+.Dialog-open {
+  
+}
+.Dialog-open:hover {
+  opacity: 1;
+}
+
+.Dialog-close {
+  float: right;
+}
+
+
+.Dialog-highscores table {
+  text-align: left;
+  width: 100%;
+}
+
+.Dialog-highscores th {
+  font-weight: 600;
+}
+
+
+
+
+
+
+
+.SoundToggle {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 10px solid var(--color-green);
+
+  z-index: 999;
+
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+
+  background: var(--color-green) url('../images/sound-mute.svg') no-repeat 50% 50%;
+
+  transition: background-color 300ms ease, border 300ms ease;
+}
+
+.SoundToggle:hover,
+.SoundToggle:active {
+  background-color: var(--color-green-active);
+  border-color: var(--color-green-active);
+}
+
+.SoundToggle.is-active {
+  background-image: url('../images/sound.svg');
+}
