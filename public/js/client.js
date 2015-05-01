@@ -147,6 +147,11 @@
     urls: ['../audio/coin.wav']
   });
 
+  var deathSound = new Howl({
+    urls: ['../audio/died.wav'],
+    volue: 0.1
+  });
+
 
 
 
@@ -216,7 +221,7 @@
     $localScore.text(localScore);
     $globalScore.text(globalScore);
 
-    remotePlayers = [];
+    //remotePlayers = [];
     remoteBullets = [];
     enemies = [];
     bullets = [];
@@ -230,6 +235,8 @@
   function init() {
     localPlayer = new Player(Math.random() * (canvasWidth - 22), (canvasHeight - 44));
     localPlayer.id = socket.id;
+
+    console.log('init!');
 
     socket.emit('new player', localPlayer);
 
@@ -304,23 +311,23 @@
         rightBullet.id = _.uniqueId('bullet_');
         leftBullet.id = _.uniqueId('bullet_');
 
-        socket.emit('new bullet', {
-          y: y,
-          x: x
-          id: upBullet.id
-        });
-
-        socket.emit('new bullet', {
-          y: y,
-          x: x,
-          id: rightBullet.id
-        });
-
-        socket.emit('new bullet', {
-          y: y,
-          x: x,
-          id: leftBullet.id
-        });
+        socket.emit('new bullet', [
+          {
+            y: y,
+            x: x,
+            id: upBullet.id
+          },
+          {
+            y: y,
+            x: x,
+            id: rightBullet.id
+          },
+          {
+            y: y,
+            x: x,
+            id: leftBullet.id
+          }
+        ]);
 
         bullets.push(upBullet, rightBullet, leftBullet);
 
@@ -493,8 +500,6 @@
           // Add an explosion
           explosions.push(newExplosion);
 
-          scoreSound.play();
-
           // Remove the bullet and stop this iteration
           bullets.splice(j, 1);
           break;
@@ -508,6 +513,8 @@
           });
           localPlayer.dead = true;
           localGameOver();
+
+          deathSound.play();
         }
       }
     }
@@ -572,7 +579,10 @@
       renderEntity(localPlayer);
     }
 
-    renderEntities(remotePlayers);
+    if (remotePlayers.length) {
+      renderEntities(remotePlayers);
+    }
+
     renderEntities(remoteBullets);
     renderEntities(bullets);
     renderEntities(enemies);
@@ -609,15 +619,18 @@
   }
 
   function globalGameOver() {
-    $gameOver.show();
+    //$gameOver.show();
     // $form.show();
     isGameOver = true;
 
-    $body.removeClass('is-playing');
+    window.setTimeout(function () {
+      $body.removeClass('is-playing');
+      $playButton.text('Spela igen!');
 
-    successSound.play();
+      successSound.play();
 
-    showAlert('Game over! You scored ' + localScore + ' points and your team scored ' + globalScore + ' points!');
+      showAlert('Game over! You scored ' + localScore + ' points and your team scored ' + globalScore + ' points!');
+    }, 200);
   }
 
 
@@ -748,9 +761,12 @@
 
 
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', function (data) {
     console.log('Disconnected from socket server...');
     showAlert('Looks the server crashed...');
+
+    console.log(data);
+
   });
 
 
@@ -766,6 +782,8 @@
 
 
   socket.on('new player', function (data) {
+    console.log(data.id, socket.id);
+
     if (characterById(data.id, remotePlayers)) {
       console.log('this player already exists!');
     } else {
@@ -836,6 +854,9 @@
       console.log('Dead player to move not found: ' + data.id);
       return;
     }
+
+    var newExplosion = new Explosion(deadPlayer.x, deadPlayer.y);
+    explosions.push(newExplosion);
 
     remotePlayers.splice(remotePlayers.indexOf(deadPlayer), 1);
 

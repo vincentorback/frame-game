@@ -102,6 +102,7 @@ app.use('/', function (req, res) {
 
 var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 var players = [];
+var deadPlayers = [];
 var bullets = [];
 var enemies = [];
 var globalScore = 0;
@@ -110,7 +111,6 @@ var canvasWidth = 1000;
 var canvasHeight = 600;
 
 var spanwInterval = 2000; // The time between each enemy spawn.
-
 
 
 
@@ -165,8 +165,6 @@ function spawnEnemy() {
       spanwInterval -= 1;
     }
 
-    console.log(spanwInterval);
-
     spawnEnemy();
   }, spanwInterval);
 }
@@ -188,8 +186,9 @@ io.sockets.on('connection', function (socket) {
   /** NEW PLAYER HAS JOINED **/
 
   socket.on('new player', function (data) { // x, y, sprite
-    if (getCharacterById(socket.id, players)) {
-      console.log('Player already registered');
+    
+    if (getCharacterById(data.id, players)) {
+      console.log('This player is already added!');
       return;
     }
 
@@ -280,18 +279,36 @@ io.sockets.on('connection', function (socket) {
 
   // Bullet shot from the client!
   socket.on('new bullet', function (data) {
-    var newBullet = new Character(data.x, data.y);
-    newBullet.id = data.id;
+    if (_.isArray(data)) {
+      for (var i = 0; data.length > i; i += 1) {
+        var bullet = data[i];
+        var newBullet = new Character(bullet.x, bullet.y);
+        newBullet.id = bullet.id;
 
-    // Broadcast new player to connected socket clients
-    socket.broadcast.emit('new bullet', {
-      id: newBullet.id,
-      x: newBullet.getX(),
-      y: newBullet.getY()
-    });
+        // Broadcast new player to connected socket clients
+        socket.broadcast.emit('new bullet', {
+          id: newBullet.id,
+          x: newBullet.getX(),
+          y: newBullet.getY()
+        });
 
-    // Add new bullet to the players array
-    bullets.push(newBullet);
+        // Add new bullet to the players array
+        bullets.push(newBullet);
+      }
+    } else {
+      var newBullet = new Character(data.x, data.y);
+      newBullet.id = data.id;
+
+      // Broadcast new player to connected socket clients
+      socket.broadcast.emit('new bullet', {
+        id: newBullet.id,
+        x: newBullet.getX(),
+        y: newBullet.getY()
+      });
+
+      // Add new bullet to the players array
+      bullets.push(newBullet);
+    }
   });
 
 
@@ -309,15 +326,16 @@ io.sockets.on('connection', function (socket) {
     }
 
     deadPlayer.dead = true;
+    deadPlayers.push(deadPlayer);
 
     // Emit to others that the player is dead
     socket.broadcast.emit('player dead', {
       id: data.id
     });
+
     io.sockets.emit('update score', globalScore);
 
-    // If you and everyone is dead, GAME OVER!!
-    if ((players.length === 1) && (deadPlayer.id === socket.id)) {
+    if (deadPlayers.length === players.length) {
       io.sockets.emit('game over');
 
       globalScore = 0;
@@ -325,7 +343,7 @@ io.sockets.on('connection', function (socket) {
       bullets = [];
       enemies = [];
 
-      console.log('clear timeout');
+      console.log('GAME OVER!');
       clearTimeout(spawnTimer);
     }
   });
