@@ -22,6 +22,13 @@
     render: function (ctx) {
       var frame;
 
+      if (!ctx) {
+        alert("A canvas is required");
+      }
+      if(!this.url) {
+        alert("An image is required");
+      }
+
       if (this.speed > 0) {
         var max = this.frames.length;
         var idx = Math.floor(this._index);
@@ -44,6 +51,8 @@
       } else {
         x += frame * this.size[0];
       }
+
+
 
       ctx.drawImage(resources.get(this.url), x, y, this.size[0], this.size[1], 0, 0, this.size[0], this.size[1]);
       // image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight

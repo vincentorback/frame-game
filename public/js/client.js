@@ -5,24 +5,18 @@
 
 
 
+
+
   // Game size
   var winWidth = window.innerWidth;
   var winHeight = window.innerHeight;
-  var canvasWidth = winWidth;
-  var canvasHeight = winHeight;
+  var canvasWidth = (winWidth > 800) ? 700 : winWidth;
+  var canvasHeight = (winHeight > 600) ? 500 : winHeight - document.getElementById('footer').offsetHeight;
 
 
   // Create the canvas
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
-
-  if (winWidth > 600 && winHeight > 600) {
-    canvasWidth = 500;
-    canvasHeight = 500;
-    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
-  } else {
-    canvas.style.bottom = (document.getElementById('footer').offsetHeight * 2) + 'px';
-  }
   
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
@@ -30,6 +24,29 @@
 
 
 
+
+  // finally query the various pixel ratios
+  var devicePixelRatio = window.devicePixelRatio || 1,
+    backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+                        ctx.mozBackingStorePixelRatio ||
+                        ctx.msBackingStorePixelRatio ||
+                        ctx.oBackingStorePixelRatio ||
+                        ctx.backingStorePixelRatio || 1,
+    ratio = devicePixelRatio / backingStoreRatio;
+
+  // upscale the canvas if the two ratios don't match
+   if (devicePixelRatio !== backingStoreRatio) {
+       var oldWidth = canvas.width;
+       var oldHeight = canvas.height;
+
+       canvas.width = oldWidth * ratio;
+       canvas.height = oldHeight * ratio;
+
+       canvas.style.width = oldWidth + 'px';
+       canvas.style.height = oldHeight + 'px';
+
+       ctx.scale(ratio, ratio);
+   }
 
   
 
@@ -40,7 +57,8 @@
   // Game variables
   var player = {
     pos: [0, 0],
-    sprite: new Sprite('images/sprites.png', [0, 0], [22, 44], 12, [2, 3, 4, 5, 6, 7, 0, 1])
+    //sprite: new Sprite('images/sprites.png', [0, 0], [22, 44], 12, [2, 3, 4, 5, 6, 7, 0, 1])
+    sprite: new Sprite('images/sprites.png', [0, 0], [22, 44], 12, [2])
   };
 
   var bullets = [];
@@ -86,6 +104,7 @@
   var $closeDialog = $('.js-closeDialog');
 
   var $playButton = $('.js-playButton');
+  var $pauseButton = $('.js-pauseButton');
 
   var $alert = $('.js-alert');
   var $highscoreTable = $('#highscore-table');
@@ -127,6 +146,7 @@
   and expressing all movements in pixels/second units.
   Movement then becomes x += 50 * dt, or "50 pixels per second".
   */
+  var requestID;
   var lastTime;
   function main() {
     var now = Date.now();
@@ -136,13 +156,23 @@
     render();
 
     lastTime = now;
-    window.requestAnimationFrame(main);
+    requestID = window.requestAnimationFrame(main);
   }
 
 
   // Initialize the game
   function init() {
     $playButton.on('click', reset);
+
+    $pauseButton.on('click', function () {
+      if ($pauseButton.hasClass('is-active')) {
+        //requestID = window.requestAnimationFrame(main);
+        //$pauseButton.removeClass('is-active')
+      } else {
+        //window.cancelAnimationFrame(requestID);
+        //$pauseButton.addClass('is-active')
+      }
+    });
 
     reset();
     lastTime = Date.now();
@@ -155,6 +185,7 @@
     gameTime += dt;
 
     handleInput(dt);
+
     updateEntities(dt);
 
     // It gets harder over time by adding enemies using this equation: 1-.993^gameTime
@@ -179,22 +210,31 @@
   };
 
 
+
+
   // Handle all inputs
   // in `js/input.js` you’ll find the helpers
   function handleInput(dt) {
-    if (input.isDown('DOWN') || input.isDown('s')) {
+
+    if (input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT')) {
+      player.sprite.frames = [2, 3, 4, 5, 6, 7, 0, 1];
+    } else {
+      player.sprite.frames = [2];
+    }
+
+    if (input.isDown('DOWN')) {
       player.pos[1] += playerSpeed * dt;
     }
 
-    if (input.isDown('UP') || input.isDown('w')) {
+    if (input.isDown('UP')) {
       player.pos[1] -= playerSpeed * dt;
     }
 
-    if (input.isDown('LEFT') || input.isDown('a')) {
+    if (input.isDown('LEFT')) {
       player.pos[0] -= playerSpeed * dt;
     }
 
-    if (input.isDown('RIGHT') || input.isDown('d')) {
+    if (input.isDown('RIGHT')) {
       player.pos[0] += playerSpeed * dt;
     }
 
@@ -529,8 +569,8 @@
 
 
 
-  if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-    showAlert('Sorry! Det här spelet funkar bara på datorer just nu!');
+  if (Modernizr.touchevents || !Modernizr.canvas) {
+    window.alert('Sorry! Det här spelet funkar inte på din enhet just nu! Antingen är den för gammal eller så är det en "touch"-enhet :/');
   } else {
     showAlert('Spring med piltangenterna och skjut med mellanslag!');
   }
