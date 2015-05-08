@@ -1,3 +1,5 @@
+/* global $ */
+/* global Sprite */
 (function (window) {
   'use strict';
 
@@ -6,23 +8,13 @@
 
 
   // Game size
-  var winWidth = window.innerWidth;
-  var winHeight = window.innerHeight;
-  var canvasWidth = winWidth;
-  var canvasHeight = winHeight;
+  var canvasWidth = window.innerWidth;
+  var canvasHeight = window.innerHeight - document.getElementById('footer').offsetHeight;
 
 
   // Create the canvas
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
-
-  if (winWidth > 600 && winHeight > 600) {
-    canvasWidth = 500;
-    canvasHeight = 500;
-    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
-  } else {
-    canvas.style.bottom = (document.getElementById('footer').offsetHeight * 2) + 'px';
-  }
   
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
@@ -86,6 +78,7 @@
   var $closeDialog = $('.js-closeDialog');
 
   var $playButton = $('.js-playButton');
+  var $pauseButton = $('.js-pauseButton');
 
   var $alert = $('.js-alert');
   var $highscoreTable = $('#highscore-table');
@@ -106,11 +99,11 @@
 
   // We need to load all your assets before starting the game so that they can be immediately used.
   // Like this, we can cache our resources.
-  resources.load([
+  Resources.load([
     'images/sprites.png'
   ]);
   
-  resources.onReady(function () {
+  Resources.onReady(function () {
     $body.addClass('is-loaded');
     init();
   });
@@ -128,6 +121,7 @@
   Movement then becomes x += 50 * dt, or "50 pixels per second".
   */
   var lastTime;
+  var frameInterval;
   function main() {
     var now = Date.now();
     var dt = (now - lastTime) / 1000.0; // time since last update
@@ -136,7 +130,7 @@
     render();
 
     lastTime = now;
-    window.requestAnimationFrame(main);
+    frameInterval = window.requestAnimationFrame(main);
   }
 
 
@@ -176,7 +170,16 @@
     checkCollisions();
 
     $score.text(' ' + score);
-  };
+  }
+
+  function pause () {
+      if ($pauseButton.hasClass('is-active')) {
+      frameInterval = window.requestAnimationFrame(main);
+    } else {
+      window.cancelAnimationFrame(frameInterval);
+    }
+    $pauseButton.toggleClass('is-active');
+  }
 
 
   // Handle all inputs
@@ -534,6 +537,30 @@
   } else {
     showAlert('Spring med piltangenterna och skjut med mellanslag!');
   }
+
+
+
+
+
+
+
+
+
+
+  $(window).on('resize', _.debounce(function () {
+    canvasWidth = window.innerWidth;
+    canvasHeight = window.innerHeight - document.getElementById('footer').offsetHeight;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    reset();
+    lastTime = Date.now();
+    window.cancelAnimationFrame(frameInterval);
+
+  }, 500));
+
+
+
 
 
 

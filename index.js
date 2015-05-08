@@ -101,6 +101,7 @@ app.use('/', function (req, res) {
 var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 var users = [];
 
+
 // Set up web sockets
 var io = require('socket.io').listen(app.listen(app.get('port')));
 io.sockets.on('connection', function (socket) {
@@ -117,6 +118,7 @@ io.sockets.on('connection', function (socket) {
     var date = new Date(),
       niceHour = date.getHours() > 9 ? date.getHours() : (0 + '' + date.getHours()),
       niceMinutes = date.getMinutes() > 9 ? date.getMinutes() : (0 + '' + date.getMinutes()),
+      week = getWeekNumber(date),
       niceDate = niceHour + ':' + niceMinutes + ' - ' + date.getDate() + ' ' + months[date.getMonth()],
       scoreTen;
 
@@ -166,3 +168,21 @@ io.sockets.on('connection', function (socket) {
   });
 
 });
+
+
+
+
+function getWeekNumber(d) {
+  // Copy date so don't modify original
+  d = new Date( + d);
+  d.setHours(0, 0, 0);
+  // Set to nearest Thursday: current date + 4 - current day number
+  // Make Sunday's day number 7
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  // Get first day of year
+  var yearStart = new Date(d.getFullYear(), 0, 1);
+  // Calculate full weeks to nearest Thursday
+  var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7)
+  // Return array of year and week number
+  return [d.getFullYear(), weekNo];
+}
