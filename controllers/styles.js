@@ -16,7 +16,11 @@ var renderer = function (req, res, next) {
 
   var input = fs.readFileSync(CSS_PATH + '/style.css', 'utf8');
   var prefixed = autoprefixer(prefixConfig).process(input).css;
-  var output = cssnext(prefixed);
+  var output = cssnext(prefixed, {
+    from: CSS_PATH + '/style.css',
+    url: false,
+    compress: true
+  });
 
   fs.writeFileSync(CSS_PATH + '/style-min.css', output);
   return next();

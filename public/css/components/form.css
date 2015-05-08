@@ -1,0 +1,39 @@
+label,
+button,
+.Form-input[type="color"] {
+  cursor: pointer;
+}
+
+
+
+.Form {
+  
+}
+
+.Form-input,
+.Form-button {
+  border-radius: 0;
+  width: 100%;
+  min-width: 150px;
+  padding: 1em 2em;
+}
+
+.Form-input {
+  background: #fff;
+  color: var(--color-text);
+  padding: 1em;
+}
+
+::placeholder {
+   color: var(--color-text);
+}
+
+
+
+
+.Form-input[type="color"] {
+  padding: 0;
+  height: 4em;
+  border: 2px solid var(--color-blue);
+  background: var(--color-blue);
+}

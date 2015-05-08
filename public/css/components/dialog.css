@@ -1,0 +1,53 @@
+
+.Dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 99;
+
+  transform: translate(-50%, -50%);
+
+  width: 80%;
+  max-width: 600px;
+  margin: 0 auto;
+  
+  padding: 30px;
+  border: 5px solid var(--color-text);
+  background: white;
+  color: black;
+}
+
+.Dialog h1 {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.Dialog h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.Dialog-highscores {
+  margin-top: 1em;
+}
+
+.Dialog-open {
+  
+}
+.Dialog-open:hover {
+  opacity: 1;
+}
+
+.Dialog-close {
+  float: right;
+}
+
+
+.Dialog-highscores table {
+  text-align: left;
+  width: 100%;
+}
+
+.Dialog-highscores th {
+  font-weight: 600;
+}

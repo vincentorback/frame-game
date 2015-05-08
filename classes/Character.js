@@ -1,7 +1,7 @@
 /**************************************************
 ** GAME Character CLASS
 **************************************************/
-var Character = function(startX, startY) {
+var Character = function(startX, startY, color) {
   var x = startX,
     y = startY,
     id;
@@ -29,7 +29,8 @@ var Character = function(startX, startY) {
     getY: getY,
     setX: setX,
     setY: setY,
-    id: id
+    id: id,
+    color: color
   }
 };
 

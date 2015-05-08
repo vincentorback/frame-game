@@ -1,0 +1,48 @@
+
+
+
+
+
+.Alert {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 99;
+
+  max-width: 500px;
+  
+  padding: 10px 15px;
+  background: #fff;
+  background: rgba(255,255,255,.95);
+  color: var(--color-green);
+
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.Alert.is-active {
+  animation: alertFadeIn 500ms ease 1;
+  animation-fill-mode: forwards;
+}
+
+
+@media (min-width: 600px) {
+  .Alert {
+    min-width: 500px;
+    background: var(--color-green);
+    color: #fff;
+  }
+}
+
+
+@keyframes alertFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

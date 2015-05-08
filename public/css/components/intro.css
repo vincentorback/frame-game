@@ -1,0 +1,147 @@
+
+
+
+.Intro {
+  position: absolute;
+  top: 50%;
+  width: 80%;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  z-index: -1;
+  visibility: hidden;
+
+  opacity: 0;
+  transition: transform 300ms ease 300ms, opacity 300ms ease 300ms;
+}
+
+
+.Intro.is-active {
+  opacity: 1;
+  transform: translateY(-50%);
+  z-index: 10;
+  visibility: visible;
+}
+
+
+
+
+
+
+
+.Intro--1 {
+  text-align: center;
+}
+.Intro--1 .Intro-button {
+  transition-delay: 3000ms;
+}
+
+
+
+
+
+.Intro--2 {
+  text-align: center;
+}
+
+.Intro--2 .Intro-title {
+  font-size: 3em;
+  margin-bottom: 1em;
+}
+
+
+
+.Intro--2 {
+  text-align: center;
+}
+
+.Intro--2 .Intro-title {
+  font-size: 3em;
+}
+
+
+
+
+
+
+.Intro-form {
+  position: relative;
+  z-index: 2;
+
+  max-width: 500px;
+  margin: 2em auto;
+}
+
+
+
+
+.Intro-button {
+  transition: all 500ms ease;
+  opacity: 0;
+  margin: 100px 0 20px;
+  font-size: 1.5vw;
+  border-radius: 4vw;
+  transform: scale(0);
+}
+.Intro-button:hover {
+  transition-delay: 0;
+}
+
+.Intro-logo {
+  width: 100%;
+  margin: 0 auto;
+
+  background: transparent no-repeat 50% 50% / contain;
+  opacity: 0;
+
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.Intro-logo--daytona {
+  width: 100%;
+  min-width: 400px;
+  height: 0;
+  padding-bottom: 30%;
+
+  background-image: url('../images/logo.svg');
+
+  transform: translateY(-20px);
+  transition: all 800ms ease 500ms;
+}
+.Intro-logo--zombie {
+  position: absolute;
+  top: 11%;
+  right: 7%;
+  width: 45%;
+
+  min-width: 400px;
+  height: 0;
+  padding-bottom: 30%;
+
+  background-image: url('../images/logo2.svg');
+  
+  transform: translateY(40px);
+  transition: all 2000ms ease 2000ms;
+}
+
+
+
+.is-active .Intro-logo--daytona,
+.is-active .Intro-logo--zombie {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.is-active .Intro-button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.is-playing .Intro {
+  transition: all 2000ms ease;
+  transform: translateY(100vh);
+  opacity: 0;
+}

@@ -11,63 +11,86 @@ html(lang='en')
 
 
     .Alert.js-alert
-    
 
 
-    .Intro
-      .Intro-inner
+
+    .Overlay.js-overlay
+
+      .Intro.Intro--1(id='step-1')
         h1.Intro-logo.Intro-logo--daytona Daytona
         h2.Intro-logo.Intro-logo--zombie Zombie Challenge
-        button.Intro-button.Button.js-playButton Starta spelet
+        button.Intro-button.Button.Button--green.Button--round.js-stepButton(data-step='2') Start game
+
+      .Intro.Intro--2(id='step-2')
+        h1.Intro-title Välj din färg!
+        .Grid
+          button.Character.Character--green.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#6cc055' title='green' data-step='3')
+          button.Character.Character--blue.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#007ec6' title='blue' data-step='3')
+          button.Character.Character--red.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ed1f27' title='red' data-step='3')
+          button.Character.Character--yellow.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ffc000' title='yellow' data-step='3')
+          button.Character.Character--orange.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ff710f' title='orange' data-step='3')
+          button.Character.Character--purple.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#663399' title='purple' data-step='3')
+          button.Character.Character--pink.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ff9daa' title='pink' data-step='3')
+          button.Character.Character--brown.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#433840' title='brown' data-step='3')
+
+      .Intro.Intro--3(id='step-3')
+        h1.Intro-title Are youuuu readyy?!?
+        p.js-online Bara du spelar just nu
+
+        button.Intro-button.Button.Button--green.Button--round.js-readyButton Jag är redo!
+        
+
 
 
 
     aside.Footer(id='footer')
       .Footer-playing
-        p.js-online
+        p.js-online Bara du spelar just nu
       .Footer-score
         p Dina poäng: 
           span.js-localScore 0
         p Allas poäng: 
           span.js-globalScore 0
       .Footer-info
-        button.Button.js-showDialog Instruktioner &amp; Highscore
+        button.Button.Button--green.js-showDialog Instruktioner &amp; Highscore
 
 
 
-    .GameOver.js-gameOver(style='display:none')
-      h1 Game Over!
+    //- .GameOver.js-gameOver(style='display:none')
+    //-   h1 Game Over!
+    //-   h2 Ni fick 
+    //-     span.js-localScore 0
+    //-     |  poäng!
 
-      form.Form(id='highschore-form')
-        input(type='text' placeholder='Skriv in ditt namn!' id='highschore-name')
-        button.Button(type='submit') Skicka
-
-      button.Button.js-resetButton Spela igen
-
+    //-   h3 Och du fick 
+    //-     span.js-localScore 0
+    //-     |  poäng!
+    //-   button.Button.js-playButton Starta spelet
 
 
-    .Dialog.js-dialog(id='dialog' style='display:none')
-      .Dialog-info
-        h1 Instruktioner
-        p Akta dig för zombies!!
-        p Använd piltangenterna och skjut med mellanslag!
 
-      .Dialog-highscores
-        h2 Top 10 Highscore
-        table(id='highscore-table')
-          thead
-            tr
-              th Namn
-              th Poäng
-              th Datum
-          tbody
-          if highscore
-            each score in highscore
-              tr
-                td #{score.name}
-                td #{score.score}
-                td #{score.niceDate}
-      button.Dialog-close.Button.js-closeDialog Stäng
+    //- .Dialog.js-dialog(id='dialog' style='display:none')
+    //-   .Dialog-info
+    //-     h1 Instruktioner
+    //-     p Akta dig för zombies!!
+    //-     p Använd piltangenterna och skjut med mellanslag!
+
+    //-   .Dialog-highscores
+    //-     h2 Top 10 Highscore
+    //-     table(id='highscore-table')
+    //-       thead
+    //-         tr
+    //-           th Namn
+    //-           th Poäng
+    //-           th Datum
+    //-       tbody
+    //-       if highscore
+    //-         each score in highscore
+    //-           tr
+    //-             td #{score.name}
+    //-             td #{score.score}
+    //-             td #{score.niceDate}
+    //-   button.Dialog-close.Button.js-closeDialog Stäng
 
 
     button.SoundToggle.js-soundToggle.is-active Toggle sound

@@ -1,0 +1,82 @@
+
+
+
+.Footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9;
+
+  background: #fff;
+  border-top: 1px solid var(--color-gray);
+  padding: 15px;
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .Footer {
+    transform: translateY(100%);
+    transition: transform 500ms ease 1000ms;
+  }
+}
+
+.is-playing .Footer {
+  transform: translateY(0);
+}
+
+
+
+.Footer-playing,
+.Footer-score {
+  margin-bottom: 15px;
+}
+
+.Footer-score {
+  min-width: 200px;
+}
+
+@media (min-width: 600px) {
+  .Footer > div {
+    vertical-align: middle;
+    display: inline-block;
+    margin: 0 15px;
+  }
+}
+
+
+
+
+
+
+
+.SoundToggle {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 10px solid var(--color-green);
+
+  z-index: 999;
+
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+
+  background: var(--color-green) url('../images/sound-mute.svg') no-repeat 50% 50%;
+
+  transition: background-color 300ms ease, border 300ms ease;
+}
+
+.SoundToggle:hover,
+.SoundToggle:active {
+  background-color: var(--color-green-active);
+  border-color: var(--color-green-active);
+}
+
+.SoundToggle.is-active {
+  background-image: url('../images/sound.svg');
+}

@@ -15,24 +15,34 @@
   var ctx = canvas.getContext('2d');
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
+  //canvas.classList.add('Canvas');
   document.body.appendChild(canvas);
 
 
 
   
-  var Player = function (startX, startY) {
+  var Player = function (startX, startY, color) {
     this.x = startX;
     this.y = startY;
     this.sprite = new Sprite('images/sprites.png', [0, 0], [22, 44], 12, [2, 3, 4, 5, 6, 7, 0, 1]),
     this.powerUp = false;
     this.dead = false;
+    this.color = color || '#FFFFFF';
   };
 
-  var Bullet = function (startX, startY, dir) {
+  var Bullet = function (startX, startY, color, dir) {
     this.x = startX;
     this.y = startY;
-    this.sprite = new Sprite('images/sprites.png', [5, 137], [12, 12]);
-    this.dir = dir || 'up';
+    this.dir = dir || 'right';
+    this.size = [5, 5];
+    this.color = color || '#FFFFFF';
+
+    this.render = function (ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size[0], 0, 2 * Math.PI);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    };
   };
 
   var Enemy = function (startX, startY) {
@@ -56,6 +66,7 @@
 
 
   var localPlayer;
+  var playerColor = '#FFFFFF';
   var remotePlayers = [];
   var bullets = [];
   var remoteBullets = [];
@@ -99,13 +110,19 @@
   var $closeDialog = $('.js-closeDialog');
 
   var $playButton = $('.js-playButton');
+  var $pauseButton = $('.js-pauseButton');
   var $resetButton = $('.js-resetButton');
+  var $readyButton = $('.js-readyButton');
 
   var $form = $('#highschore-form');
   var $formName = $('#highschore-name');
   var $highscoreTable = $('#highscore-table');
 
   var $soundToggle = $('.js-soundToggle');
+  var $colorPick = $('.js-colorPick');
+  var $stepButton = $('.js-stepButton');
+
+  var activeStep;
 
 
 
@@ -114,6 +131,19 @@
 
 
 
+  $stepButton.on('click', function () {
+    $('#step-' + activeStep).removeClass('is-active');
+
+    activeStep = $(this).data('step');
+    $('#step-' + activeStep).addClass('is-active');
+  });
+
+
+
+
+  $colorPick.on('click', function () {
+    playerColor = $(this).val();
+  });
 
 
 
@@ -126,7 +156,8 @@
     'images/sprites.png'
   ]);
   resources.onReady(function () {
-    $body.addClass('is-loaded');
+    $('#step-1').addClass('is-active');
+    activeStep = 1;
   });
 
 
@@ -192,6 +223,7 @@
   Movement then becomes x += 50 * dt, or '50 pixels per second'.
   */
   var lastTime;
+  var frameInterval;
   function main() {
     var now = Date.now();
     var dt = (now - lastTime) / 1000.0; // time since last update
@@ -200,7 +232,21 @@
     render();
 
     lastTime = now;
-    window.requestAnimationFrame(main);
+    frameInterval = window.requestAnimationFrame(main);
+  }
+
+
+
+  function pause(state) {
+    state = state || $pauseButton.hasClass('is-active');
+
+    if (state) {
+      window.cancelAnimationFrame(frameInterval);
+    } else {
+      frameInterval = window.requestAnimationFrame(main);
+    }
+
+    $pauseButton.toggleClass('is-active');
   }
 
 
@@ -216,7 +262,9 @@
     localScore = 0;
     globalScore = 0;
 
-    localPlayer.dead = false;
+    if (localPlayer) {
+      localPlayer.dead = false;
+    }
 
     $localScore.text(localScore);
     $globalScore.text(globalScore);
@@ -231,15 +279,36 @@
 
 
 
-  // Initialize the game
-  function init() {
-    localPlayer = new Player(Math.random() * (canvasWidth - 22), (canvasHeight - 44));
-    localPlayer.id = socket.id;
 
-    console.log('init!');
 
-    socket.emit('new player', localPlayer);
 
+
+
+  function readyState() {
+    if (playerColor) {
+
+      localPlayer = new Player(5, Math.random() * (canvasHeight - 44), playerColor);
+      localPlayer.id = socket.id;
+
+      console.log(socket.id);
+
+      socket.emit('new player', localPlayer);
+      socket.emit('player ready', localPlayer);
+
+      showAlert('Yeah nu kör vi! Ska bara vänta på resten...');
+    } else {
+      showAlert('Hur kunde du inte välja färg?');
+    }
+
+    $readyButton.prop('disabled', true);
+  }
+
+
+
+
+
+
+  function startGame() {
     reset();
     lastTime = Date.now();
     main();
@@ -247,6 +316,8 @@
     $body.addClass('is-playing');
     showAlert('Spring med piltangenterna och skjut med mellanslag!');
   }
+
+
 
 
   // Update game objects
@@ -257,6 +328,8 @@
     updateEntities(dt);
     checkCollisions();
   }
+
+
 
 
   // Handle all inputs
@@ -303,43 +376,47 @@
       var y = localPlayer.y + localPlayer.sprite.size[1] / 2;
 
       if (localPlayer.powerUp === true) {
-        var upBullet = new Bullet(x, y, 'up');
-        var rightBullet = new Bullet(x, y, 'left');
-        var leftBullet = new Bullet(x, y, 'right');
+        var upBullet = new Bullet(x, y, localPlayer.color, 'up');
+        var rightBullet = new Bullet(x, y, localPlayer.color, 'right');
+        var downBullet = new Bullet(x, y, localPlayer.color, 'down');
 
         upBullet.id = _.uniqueId('bullet_');
         rightBullet.id = _.uniqueId('bullet_');
-        leftBullet.id = _.uniqueId('bullet_');
+        downBullet.id = _.uniqueId('bullet_');
 
         socket.emit('new bullet', [
           {
             y: y,
             x: x,
-            id: upBullet.id
+            id: upBullet.id,
+            color: localPlayer.color
           },
           {
             y: y,
             x: x,
-            id: rightBullet.id
+            id: rightBullet.id,
+            color: localPlayer.color
           },
           {
             y: y,
             x: x,
-            id: leftBullet.id
+            id: downBullet.id,
+            color: localPlayer.color
           }
         ]);
 
-        bullets.push(upBullet, rightBullet, leftBullet);
+        bullets.push(upBullet, rightBullet, downBullet);
 
       } else {
-        var newBullet = new Bullet(x, y);
+        var newBullet = new Bullet(x, y, localPlayer.color, 'right');
 
         newBullet.id = _.uniqueId('bullet_');
 
         socket.emit('new bullet', {
           y: y,
           x: x,
-          id: newBullet.id
+          id: newBullet.id,
+          color: localPlayer.color
         });
 
         bullets.push(newBullet);
@@ -366,7 +443,14 @@
     for (i; i < bullets.length; i += 1) {
       var bullet = bullets[i];
 
-      bullet.y -= bulletSpeed * dt; // Go upwards!
+      switch(bullet.dir) {
+        case 'up': bullet.y -= bulletSpeed * dt; break;
+        case 'down': bullet.y += bulletSpeed * dt; break;
+        case 'left': bullet.x -= bulletSpeed * dt; break;
+        default: bullet.x += bulletSpeed * dt;
+      }
+
+      
 
       // Remove the bullet if it goes offscreen
       if (bullet.y < 0 || bullet.y > canvasHeight || bullet.x > canvasWidth) {
@@ -382,7 +466,13 @@
     for (i; i < remoteBullets.length; i += 1) {
       var bullet = remoteBullets[i];
 
-      bullet.y -= bulletSpeed * dt; // Go upwards!
+      switch(bullet.dir) {
+        case 'up': bullet.y -= bulletSpeed * dt; break;
+        case 'down': bullet.y += bulletSpeed * dt; break;
+        case 'left': bullet.x -= bulletSpeed * dt; break;
+        default: bullet.x += bulletSpeed * dt;
+      }
+      
 
       // Remove the bullet if it goes offscreen
       if (bullet.y < 0 || bullet.y > canvasHeight || bullet.x > canvasWidth) {
@@ -397,11 +487,11 @@
     // Update all enemies
     var i = 0;
     for (i; i < enemies.length; i += 1) {
-      enemies[i].y += enemySpeed * dt;
+      enemies[i].x -= enemySpeed * dt;
       enemies[i].sprite.update(dt);
 
       // Remove if offscreen
-      if (enemies[i].y + enemies[i].sprite.size[0] > canvasHeight) {
+      if (-(enemies[i].sprite.size[0]) > enemies[i].x) {
         enemies.splice(i, 1);
         i--;
       }
@@ -477,7 +567,7 @@
       for (var j = 0; j < bullets.length; j += 1) {
         var x2 = bullets[j].x;
         var y2 = bullets[j].y;
-        var bulletSize = bullets[j].sprite.size;
+        var bulletSize = bullets[j].size;
 
         if (boxCollides(x, y, enemySize, x2, y2, bulletSize)) {
 
@@ -598,8 +688,13 @@
 
   function renderEntity(entity) {
     ctx.save();
-    ctx.translate(entity.x, entity.y);
-    entity.sprite.render(ctx);
+    if (entity.sprite) {
+      ctx.translate(entity.x, entity.y);
+      entity.sprite.render(ctx);
+    } else {
+      entity.render(ctx, localPlayer.color);
+      ctx.translate(entity.x, entity.y);
+    }
     ctx.restore();
   }
 
@@ -624,7 +719,8 @@
     isGameOver = true;
 
     window.setTimeout(function () {
-      $body.removeClass('is-playing');
+      //$body.removeClass('is-playing');
+      $gameOver.show();
       $playButton.text('Spela igen!');
 
       successSound.play();
@@ -640,6 +736,7 @@
 
 
 
+  $readyButton.on('click', readyState);
 
 
 
@@ -688,17 +785,12 @@
   World speed reading champion = 4,700
   Average adult: 300
   */
-  var alerts = 0;
-
-  // Notification.requestPermission();
-
   function showAlert(message) {
     var totalWords,
       wordsPerMillisecond,
       totalReadingTime,
       wordsPerMinute = 250,
-      messageTest,
-      messageID = _.uniqueId('alert_');
+      messageTest;
 
     messageTest = message.replace(/<\/?[^>]+(>|$)/g, ''); // Remove any HTML-tags
     totalWords = messageTest.split(/\s+/g).length; // Split up in words
@@ -706,18 +798,26 @@
     totalReadingTime = Math.floor(totalWords / wordsPerMillisecond);
     totalReadingTime = (totalReadingTime > 10000) ? totalReadingTime : 10000;
 
-    console.log(message);
-
-    // var notification = new Notification('Daytona Zombie Challenge', {
-    //   dir: 'rtl',
-    //   body: message,
-    //   tag: messageID,
-    //   icon: 'images/icon.png'
-    // });
+    $alert
+      .html(message)
+      .addClass('is-active');
 
     _.delay(function () {
-      // notification.close();
+      $alert.removeClass('is-active');
     }, totalReadingTime);
+  }
+
+
+
+
+
+
+  function updateOnlineCount() {
+    if (remotePlayers.length > 0) {
+      $online.text((remotePlayers.length + 1) + ' personer spelar just nu');
+    } else {
+      $online.text('Bara du spelar just nu');
+    }
   }
 
 
@@ -728,6 +828,10 @@
 
   $playButton.on('click', function () {
     socket.emit('start game');
+  });
+
+  $pauseButton.on('click', function () {
+    pause();
   });
 
   $resetButton.on('click', reset);
@@ -754,25 +858,24 @@
 
 
 
-  // Emit that a new player has joined
-  socket.on('connect', function () {
-    
-  });
 
 
 
   socket.on('disconnect', function (data) {
     console.log('Disconnected from socket server...');
-    showAlert('Looks the server crashed...');
+    showAlert('Looks like the server crashed...');
+  });
 
-    console.log(data);
 
+
+  socket.on('alert', function (data) {
+    showAlert(data.message);
   });
 
 
 
   socket.on('start game', function () {
-    init();
+    startGame();
   });
 
 
@@ -782,15 +885,15 @@
 
 
   socket.on('new player', function (data) {
-    console.log(data.id, socket.id);
-
     if (characterById(data.id, remotePlayers)) {
       console.log('this player already exists!');
     } else {
-      var newPlayer = new Player(data.x, data.y);
+      var newPlayer = new Player(data.x, data.y, data.color);
       newPlayer.id = data.id;
       remotePlayers.push(newPlayer);
     }
+
+    updateOnlineCount();
   });
 
 
@@ -813,12 +916,14 @@
     var newEnemy = new Enemy(data.x, data.y);
     newEnemy.id = data.id;
     enemies.push(newEnemy);
+
+    console.log(data.x, data.y, canvasWidth, canvasHeight);
   });
 
 
 
   socket.on('new bullet', function (data) {
-    var newBullet = new Bullet(data.x, data.y);
+    var newBullet = new Bullet(data.x, data.y, data.color);
     newBullet.id = data.id;
     remoteBullets.push(newBullet);
   });
@@ -875,6 +980,8 @@
     }
 
     remotePlayers.splice(remotePlayers.indexOf(removePlayer), 1);
+
+    updateOnlineCount();
   });
 
 

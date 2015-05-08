@@ -1,0 +1,49 @@
+.Character {
+  height: 0;
+  padding-bottom: 25%;
+  
+  opacity: .8;
+  transition: opacity 200ms ease;
+}
+
+
+.Character:hover {
+  opacity: 1;
+}
+
+
+
+
+
+
+.Character--blue {
+  background: var(--color-blue);
+}
+
+.Character--red {
+  background: var(--color-red);
+}
+
+.Character--green {
+  background: var(--color-green);
+}
+
+.Character--orange {
+  background: var(--color-orange);
+}
+
+.Character--yellow {
+  background: var(--color-yellow);
+}
+
+.Character--purple {
+  background: var(--color-purple);
+}
+
+.Character--pink {
+  background: var(--color-pink);
+}
+
+.Character--brown {
+  background: var(--color-brown);
+}

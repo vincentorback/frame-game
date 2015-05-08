@@ -106,6 +106,7 @@ var deadPlayers = [];
 var bullets = [];
 var enemies = [];
 var globalScore = 0;
+var readyPlayers = 0;
 
 var canvasWidth = 1000;
 var canvasHeight = 600;
@@ -139,8 +140,8 @@ var spawnTimer;
 function spawnEnemy() {
   spawnTimer = _.delay(function() {
 
-    var newX = Math.random() * (canvasWidth - 22),
-      newY = -44,
+    var newX = canvasWidth + 22,
+      newY = Math.random() * (canvasHeight - 44),
       newEnemy = new Character(newX, newY),
       i,
       existingEnemy;
@@ -174,11 +175,35 @@ io.sockets.on('connection', function (socket) {
 
 
 
+  socket.on('player ready', function (data) {
+    // Find player in array
+    var readyPlayer = getCharacterById(data.id, players);
 
-  socket.on('start game', function () {
-    spawnEnemy();
-    io.sockets.emit('start game');
+    // Player not found
+    if (!readyPlayer) {
+      util.log('Ready player not found: ' + this.id);
+      return;
+    }
+
+    readyPlayers += 1;
+
+    io.sockets.emit('alert', {
+      message: readyPlayers + '/' + (players.length + 1) + ' are ready to play!'
+    });
+
+    if (readyPlayers === (players.length + 1)) {
+      console.log('Spawning first enemy!');
+      spawnEnemy();
+      io.sockets.emit('start game');
+    }
   });
+
+
+
+  // socket.on('start game', function () {
+  //   spawnEnemy();
+  //   io.sockets.emit('start game');
+  // });
 
 
 
@@ -193,14 +218,15 @@ io.sockets.on('connection', function (socket) {
     }
 
     // Create a new player
-    var newPlayer = new Character(data.x, data.y);
+    var newPlayer = new Character(data.x, data.y, data.color);
     newPlayer.id = socket.id;
 
     // Broadcast new player to connected socket clients
     socket.broadcast.emit('new player', {
       id: newPlayer.id,
       x: newPlayer.getX(),
-      y: newPlayer.getY()
+      y: newPlayer.getY(),
+      color: newPlayer.color
     });
 
     // Send existing players to the new player
@@ -215,7 +241,8 @@ io.sockets.on('connection', function (socket) {
       socket.emit('new player', {
         id: existingPlayer.id,
         x: existingPlayer.getX(),
-        y: existingPlayer.getY()
+        y: existingPlayer.getY(),
+        color: newPlayer.color
       });
     }
 
@@ -235,7 +262,8 @@ io.sockets.on('connection', function (socket) {
       socket.emit('new bullet', {
         id: existingBullet.id,
         x: existingBullet.getX(),
-        y: existingBullet.getY()
+        y: existingBullet.getY(),
+        color: existingBullet.color
       });
     }
 
@@ -259,7 +287,7 @@ io.sockets.on('connection', function (socket) {
     if (!movePlayer) {
       util.log('Player not found: ' + this.id);
       return;
-    };
+    }
 
     // Update player position
     movePlayer.setX(data.x);
@@ -282,28 +310,33 @@ io.sockets.on('connection', function (socket) {
     if (_.isArray(data)) {
       for (var i = 0; data.length > i; i += 1) {
         var bullet = data[i];
-        var newBullet = new Character(bullet.x, bullet.y);
+        var newBullet = new Character(bullet.x, bullet.y, bullet.color);
+
+        console.log(bullet.color);
+
         newBullet.id = bullet.id;
 
         // Broadcast new player to connected socket clients
         socket.broadcast.emit('new bullet', {
           id: newBullet.id,
           x: newBullet.getX(),
-          y: newBullet.getY()
+          y: newBullet.getY(),
+          color: newBullet.color
         });
 
         // Add new bullet to the players array
         bullets.push(newBullet);
       }
     } else {
-      var newBullet = new Character(data.x, data.y);
+      var newBullet = new Character(data.x, data.y, data.color);
       newBullet.id = data.id;
 
       // Broadcast new player to connected socket clients
       socket.broadcast.emit('new bullet', {
         id: newBullet.id,
         x: newBullet.getX(),
-        y: newBullet.getY()
+        y: newBullet.getY(),
+        color: newBullet.color
       });
 
       // Add new bullet to the players array
