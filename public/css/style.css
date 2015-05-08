@@ -64,6 +64,10 @@ canvas {
   background: #5fa94b;
 }
 
+.Button.is-active {
+  background: #5fa94b;
+  box-shadow: inset rgba(0,0,0,.4) 0 1px 2px;
+}
 
 
 .Alert {
@@ -94,6 +98,8 @@ canvas {
 
 @media (min-width: 600px) {
   .Alert {
+    background: var(--color-green);
+    color: #fff;
     min-width: 200px;
     top: 15px;
     left: 15px;
@@ -110,14 +116,12 @@ canvas {
   left: 0;
   right: 0;
   z-index: 9;
-
-  background: #fff;
+  
   border-top: 1px solid #eee;
+  background: #fff;
   padding: 15px;
   text-align: center;
 }
-
-
 
 .Footer-playing,
 .Footer-score {
