@@ -166,11 +166,14 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
+
     readyPlayers += 1;
+
 
     io.sockets.emit('alert', {
       message: readyPlayers + '/' + (players.length + 1) + ' are ready to play!'
     });
+
 
     if (readyPlayers === (players.length + 1)) {
       console.log('Spawning first enemy!');
@@ -283,8 +286,6 @@ io.sockets.on('connection', function (socket) {
       for (var i = 0; data.length > i; i += 1) {
         var bullet = data[i];
         var newBullet = new Character(bullet.x, bullet.y, bullet.color);
-
-        console.log(bullet.color);
 
         newBullet.id = bullet.id;
 

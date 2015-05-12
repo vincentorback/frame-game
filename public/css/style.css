@@ -51,6 +51,20 @@
 
 
 
+.PlayAgain {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  border-radius: 2em;
+  padding: 1em 2em;
+}
+
+
+
+
+
 .GameOver {
   position: absolute;
   top: 50%;

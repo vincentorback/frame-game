@@ -164,6 +164,8 @@
   });
 
 
+
+
   var successSound = new Howl({
     urls: ['../audio/success.wav']
   });
@@ -183,7 +185,7 @@
 
   var deathSound = new Howl({
     urls: ['../audio/died.wav'],
-    volue: 0.1
+    volume: 0.1
   });
 
 
@@ -257,7 +259,7 @@
 
   // Reset game to original state
   function reset() {
-    $gameOver.hide();
+    // $gameOver.hide();
 
     isGameOver = false;
     gameTime = 0;
@@ -292,8 +294,6 @@
 
       localPlayer = new Player(5, Math.random() * (canvasHeight - 44), playerColor);
       localPlayer.id = socket.id;
-
-      console.log(socket.id);
 
       socket.emit('new player', localPlayer);
       socket.emit('player ready', localPlayer);
@@ -664,7 +664,7 @@
 
   // Draw everything
   function render() {
-    ctx.fillStyle = '#6cc055';
+    ctx.fillStyle = '#EEEEEE';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     // Render the localPlayer if the game isn't over
@@ -723,13 +723,18 @@
 
     window.setTimeout(function () {
       //$body.removeClass('is-playing');
-      $gameOver.show();
-      $playButton.text('Spela igen!');
+      //$gameOver.show();
 
       successSound.play();
 
       showAlert('Game over! You scored ' + localScore + ' points and your team scored ' + globalScore + ' points!');
     }, 200);
+
+    window.setTimeout(function () {
+      $playButton
+        .text('Spela igen!')
+        .show();
+    }, 5000);
   }
 
 
@@ -816,8 +821,8 @@
 
 
   function updateOnlineCount() {
-    if (remotePlayers.length > 0) {
-      $online.text((remotePlayers.length + 1) + ' personer spelar just nu');
+    if (remotePlayers.length) {
+      $online.text((remotePlayers.length + 1) + ' personer spelar just nu'); // remotePlayers + you
     } else {
       $online.text('Bara du spelar just nu');
     }
@@ -830,7 +835,9 @@
 
 
   $playButton.on('click', function () {
-    socket.emit('start game');
+    // socket.emit('start game');
+    // $playButton.hide();
+    document.location.reload(true);
   });
 
   $pauseButton.on('click', function () {
@@ -889,7 +896,7 @@
 
   socket.on('new player', function (data) {
     if (characterById(data.id, remotePlayers)) {
-      console.log('this player already exists!');
+      console.log('This player already exists!');
     } else {
       var newPlayer = new Player(data.x, data.y, data.color);
       newPlayer.id = data.id;
@@ -919,8 +926,6 @@
     var newEnemy = new Enemy(data.x, data.y);
     newEnemy.id = data.id;
     enemies.push(newEnemy);
-
-    console.log(data.x, data.y, canvasWidth, canvasHeight);
   });
 
 
