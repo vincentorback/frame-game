@@ -9,13 +9,9 @@ var request = require('request');
 var session = require('express-session');
 var util = require('util');
 
-var Character = require('./classes/Character').Character;
-
-
 
 // Set up the application
 var app = module.exports = express();
-
 
 
 // Define environment
@@ -23,16 +19,13 @@ Habitat.load();
 var env = new Habitat('daytona');
 
 
-
 // Set up database
 var db = monk(process.env.MONGOLAB_URI);
 var highscoreDB = db.get('highscore');
 
 
-
 // Define app properties
 app.set('port', process.env.PORT || 1234);
-
 
 
 // Set up views
@@ -40,10 +33,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 
-
 // Serve static files from project root
-app.use('/', express.static(path.normalize(__dirname + '/public')));
-
+app.use('/', express.static(path.normalize(__dirname + '/../public')));
 
 
 // Set up session
@@ -59,12 +50,8 @@ app.use(session({
 }));
 
 
-
-
 // Render styles
 app.use(require('./controllers/styles'));
-
-
 
 
 
@@ -112,6 +99,7 @@ var canvasWidth = 1000;
 var canvasHeight = 600;
 
 var spanwInterval = 2000; // The time between each enemy spawn.
+var Character = require('./classes/Character').Character;
 
 
 
@@ -124,12 +112,6 @@ function getCharacterById(id, type) {
   }
   return false;
 }
-
-
-
-
-
-
 
 
 
@@ -174,7 +156,6 @@ function spawnEnemy() {
 io.sockets.on('connection', function (socket) {
 
 
-
   socket.on('player ready', function (data) {
     // Find player in array
     var readyPlayer = getCharacterById(data.id, players);
@@ -199,13 +180,10 @@ io.sockets.on('connection', function (socket) {
   });
 
 
-
   // socket.on('start game', function () {
   //   spawnEnemy();
   //   io.sockets.emit('start game');
   // });
-
-
 
 
   /** NEW PLAYER HAS JOINED **/
@@ -273,10 +251,6 @@ io.sockets.on('connection', function (socket) {
 
 
 
-
-
-
-
   /** MOVE PLAYER POSITION **/
 
   socket.on('move player', function (data) {
@@ -300,8 +274,6 @@ io.sockets.on('connection', function (socket) {
       y: movePlayer.getY()
     });
   });
-
-
 
 
 
@@ -346,9 +318,6 @@ io.sockets.on('connection', function (socket) {
 
 
 
-
-
-
   socket.on('player dead', function (data) {
     var deadPlayer = getCharacterById(data.id, players);
 
@@ -380,10 +349,6 @@ io.sockets.on('connection', function (socket) {
       clearTimeout(spawnTimer);
     }
   });
-
-
-
-
 
 
 
@@ -501,9 +466,4 @@ io.sockets.on('connection', function (socket) {
   });
 
 
-
-
 });
-
-
-

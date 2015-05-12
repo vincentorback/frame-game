@@ -15,8 +15,11 @@
   var ctx = canvas.getContext('2d');
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-  //canvas.classList.add('Canvas');
   document.body.appendChild(canvas);
+
+
+  canvas.classList.add('Canvas');
+  
 
 
 

@@ -3,7 +3,7 @@ var path = require('path');
 var cssnext = require('cssnext');
 var autoprefixer = require('autoprefixer');
 
-var CSS_PATH = __dirname + '/../public/css';
+var CSS_PATH = __dirname + '/../../public/css';
 var prefixConfig = {
   browsers: ['last 2 versions', '> 1%']
 };
