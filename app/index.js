@@ -125,8 +125,7 @@ function spawnEnemy() {
     var newX = canvasWidth + 22,
       newY = Math.random() * (canvasHeight - 44),
       newEnemy = new Character(newX, newY),
-      i,
-      existingEnemy;
+      i;
 
     newEnemy.id = _.uniqueId('enemy_');
 
@@ -166,27 +165,20 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
-
     readyPlayers += 1;
 
-
-    io.sockets.emit('alert', {
-      message: readyPlayers + '/' + (players.length + 1) + ' are ready to play!'
-    });
-
-
-    if (readyPlayers === (players.length + 1)) {
-      console.log('Spawning first enemy!');
-      spawnEnemy();
-      io.sockets.emit('start game');
+    if (readyPlayers === players.length && (readyPlayers > 1)) {
+      io.sockets.emit('players ready', {
+        ready: readyPlayers
+      });
     }
   });
 
 
-  // socket.on('start game', function () {
-  //   spawnEnemy();
-  //   io.sockets.emit('start game');
-  // });
+  socket.on('start game', function () {
+    spawnEnemy();
+    io.sockets.emit('start game');
+  });
 
 
   /** NEW PLAYER HAS JOINED **/
@@ -214,7 +206,10 @@ io.sockets.on('connection', function (socket) {
     var i,
       j,
       k,
-      existingPlayer;
+      existingPlayer,
+      existingEnemy,
+      existingBullet;
+
 
     for (i = 0; i < players.length; i += 1) {
       existingPlayer = players[i];
@@ -255,7 +250,6 @@ io.sockets.on('connection', function (socket) {
 
 
   /** MOVE PLAYER POSITION **/
-
   socket.on('move player', function (data) {
     // Find player in array
     var movePlayer = getCharacterById(this.id, players);
@@ -346,7 +340,6 @@ io.sockets.on('connection', function (socket) {
       bullets = [];
       enemies = [];
 
-      console.log('GAME OVER!');
       clearTimeout(spawnTimer);
     }
   });
@@ -414,7 +407,6 @@ io.sockets.on('connection', function (socket) {
     bullets = [];
     enemies = [];
 
-    console.log('clear spawning');
     clearTimeout(spawnTimer);
   });
 
@@ -448,19 +440,19 @@ io.sockets.on('connection', function (socket) {
           if (err) throw err;
 
           socket.emit('alert', {
-            message: 'Hurra du kom med i highscore!',
+            message: 'Yay you got on the highscore!',
             openDialog: true,
             highscore: data
           });
         });
 
         socket.broadcast.emit('alert', {
-          message: data.name + ' fick precis ' + data.score + ' poäng!'
+          message: data.name + ' just got ' + data.score + ' points!'
         });
 
       } else {
         socket.emit('alert', {
-          message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + data.score + ' poäng.... Försök igen!'
+          message: 'Awww, you didn’t get on the highscore with your ' + data.score + ' points.... Try again!'
         });
       }
     });

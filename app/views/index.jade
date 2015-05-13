@@ -9,9 +9,7 @@ html(lang='en')
   body
 
 
-
     .Alert.js-alert
-
 
 
     .Overlay.js-overlay
@@ -22,87 +20,44 @@ html(lang='en')
         button.Intro-button.Button.Button--green.Button--round.js-stepButton(data-step='2') Start game
 
       .Intro.Intro--2(id='step-2')
-        h1.Intro-title Välj din färg!
+        h1.Intro-title Pick a color!
         .Grid
-          button.Character.Character--green.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#6cc055' title='green' data-step='3')
-          button.Character.Character--blue.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#007ec6' title='blue' data-step='3')
-          button.Character.Character--red.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ed1f27' title='red' data-step='3')
-          button.Character.Character--yellow.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ffc000' title='yellow' data-step='3')
-          button.Character.Character--orange.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ff710f' title='orange' data-step='3')
-          button.Character.Character--purple.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#663399' title='purple' data-step='3')
-          button.Character.Character--pink.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ff9daa' title='pink' data-step='3')
-          button.Character.Character--brown.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#433840' title='brown' data-step='3')
+          button.Character.Character--green.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#6cc055' title='Green' data-step='3')
+          button.Character.Character--blue.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#007ec6' title='Blue' data-step='3')
+          button.Character.Character--red.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ed1f27' title='Red' data-step='3')
+          button.Character.Character--yellow.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ffc000' title='Yellow' data-step='3')
+          button.Character.Character--orange.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ff710f' title='Orange' data-step='3')
+          button.Character.Character--purple.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#663399' title='Purple' data-step='3')
+          button.Character.Character--pink.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#ff9daa' title='Pink' data-step='3')
+          button.Character.Character--brown.Grid-cell.u-size1of4.js-colorPick.js-stepButton(value='#433840' title='Brown' data-step='3')
 
       .Intro.Intro--3(id='step-3')
-        h1.Intro-title Are youuuu readyy?!?
-        p.js-online Bara du spelar just nu
+        h1.Intro-title Are you ready!?
+        p.js-online
 
-        button.Intro-button.Button.Button--green.Button--round.js-readyButton Jag är redo!
-    
-    
-    button.PlayAgain.Button.Button--green.js-playButton(style='display:none') Starta spelet
+        button.Intro-button.Button.Button--green.Button--round.js-readyButton I’m ready!
 
 
+    button.PlayAgain.Button.Button--green.js-playButton(style='display:none') Start game
 
 
     aside.Footer(id='footer')
       .Footer-playing
-        p.js-online Bara du spelar just nu
+        p.js-online
       .Footer-score
-        p Dina poäng: 
+        p Your score: 
           span.js-localScore 0
-        p Allas poäng: 
+        p Total score: 
           span.js-globalScore 0
-      .Footer-info
-        button.Button.Button--green.js-showDialog Instruktioner &amp; Highscore
 
 
-
-    //- .GameOver.js-gameOver(style='display:none')
-    //-   h1 Game Over!
-    //-   h2 Ni fick 
-    //-     span.js-localScore 0
-    //-     |  poäng!
-
-    //-   h3 Och du fick 
-    //-     span.js-localScore 0
-    //-     |  poäng!
-    //-   button.Button.js-playButton Starta spelet
-
-
-
-    //- .Dialog.js-dialog(id='dialog' style='display:none')
-    //-   .Dialog-info
-    //-     h1 Instruktioner
-    //-     p Akta dig för zombies!!
-    //-     p Använd piltangenterna och skjut med mellanslag!
-
-    //-   .Dialog-highscores
-    //-     h2 Top 10 Highscore
-    //-     table(id='highscore-table')
-    //-       thead
-    //-         tr
-    //-           th Namn
-    //-           th Poäng
-    //-           th Datum
-    //-       tbody
-    //-       if highscore
-    //-         each score in highscore
-    //-           tr
-    //-             td #{score.name}
-    //-             td #{score.score}
-    //-             td #{score.niceDate}
-    //-   button.Dialog-close.Button.js-closeDialog Stäng
-
-
-    button.SoundToggle.js-soundToggle.is-active Toggle sound
-
+    button.SoundToggle.js-soundToggle.is-active(title='Toggle sound')
 
 
     script.
-      if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-        window.alert('Sorry! Det här spelet funkar bara på datorer just nu!');
-      }
+      //if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+        window.alert('Sorry this game only works on desktop for now! \n\nYEYE MOBILE FIRST AND SO ON #DEATHTOBULLSHIT \n\n(╯°□°）╯︵ ┻━┻');
+      //}
     script(src='/socket.io/socket.io.js')
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js')
     script(src='js/lodash.min.js')

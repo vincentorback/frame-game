@@ -2,23 +2,60 @@
   'use strict';
 
 
+  var Game = {};
 
 
-  // Game size
-  var winWidth = window.innerWidth;
-  var winHeight = window.innerHeight;
-  var canvasWidth = (winWidth > 1000) ? 1000 : winWidth;
-  var canvasHeight = (winHeight > 600) ? 600 : winHeight;
 
   // Create the canvas
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
+  setCanvasSize();
   document.body.appendChild(canvas);
 
 
   canvas.classList.add('Canvas');
+
+
+  // finally query the various pixel ratios
+  var devicePixelRatio = window.devicePixelRatio || 1,
+    backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+                        ctx.mozBackingStorePixelRatio ||
+                        ctx.msBackingStorePixelRatio ||
+                        ctx.oBackingStorePixelRatio ||
+                        ctx.backingStorePixelRatio || 1,
+    ratio = devicePixelRatio / backingStoreRatio;
+
+
+
+
+  function setCanvasSize() {
+    var winWidth = window.innerWidth,
+      winHeight = window.innerHeight,
+      canvasWidth = (winWidth > 1000) ? 1000 : winWidth,
+      canvasHeight = (winHeight > 600) ? 600 : winHeight;
+
+    if (devicePixelRatio !== backingStoreRatio) {
+      canvasWidth = canvasWidth * ratio;
+      canvasHeight = canvasHeight * ratio;
+
+      canvas.style.width = canvasWidth + 'px';
+      canvas.style.height = canvasHeight + 'px';
+
+      ctx.scale(ratio, ratio);
+    }
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    Game.width = canvasWidth;
+    Game.height = canvasHeight;
+  }
+
+
+
+  $(window).on('resize', function () {
+    setCanvasSize();
+  });
   
 
 
@@ -292,15 +329,13 @@
   function readyState() {
     if (playerColor) {
 
-      localPlayer = new Player(5, Math.random() * (canvasHeight - 44), playerColor);
+      localPlayer = new Player(5, Math.random() * (Game.height - 44), playerColor);
       localPlayer.id = socket.id;
 
       socket.emit('new player', localPlayer);
       socket.emit('player ready', localPlayer);
-
-      showAlert('Yeah nu kör vi! Ska bara vänta på resten...');
     } else {
-      showAlert('Hur kunde du inte välja färg?');
+      showAlert('How did you not pick a color? Contact sys-admin!');
     }
 
     $readyButton.prop('disabled', true);
@@ -316,8 +351,10 @@
     lastTime = Date.now();
     main();
 
+    $playButton.hide();
+
     $body.addClass('is-playing');
-    showAlert('Spring med piltangenterna och skjut med mellanslag!');
+    showAlert('Move with the keyboard arrows and shoot with the spacebar!');
   }
 
 
@@ -456,7 +493,7 @@
       
 
       // Remove the bullet if it goes offscreen
-      if (bullet.y < 0 || bullet.y > canvasHeight || bullet.x > canvasWidth) {
+      if (bullet.y < 0 || bullet.y > Game.height || bullet.x > Game.width) {
         bullets.splice(i, 1);
         i--;
       }
@@ -478,7 +515,7 @@
       
 
       // Remove the bullet if it goes offscreen
-      if (bullet.y < 0 || bullet.y > canvasHeight || bullet.x > canvasWidth) {
+      if (bullet.y < 0 || bullet.y > Game.height || bullet.x > Game.width) {
         remoteBullets.splice(i, 1);
         i--;
       }
@@ -513,7 +550,7 @@
       tokens[i].sprite.update(dt);
 
       // Remove if offscreen
-      if (tokens[i].y + tokens[i].sprite.size[0] > canvasHeight) {
+      if (tokens[i].y + tokens[i].sprite.size[0] > Game.height) {
         tokens.splice(i, 1);
         i--;
       }
@@ -649,14 +686,14 @@
     // Check bounds
     if (localPlayer.x < 0) {
       localPlayer.x = 0;
-    } else if (localPlayer.x > canvasWidth - localPlayer.sprite.size[0]) {
-      localPlayer.x = canvasWidth - localPlayer.sprite.size[0];
+    } else if (localPlayer.x > Game.width - localPlayer.sprite.size[0]) {
+      localPlayer.x = Game.width - localPlayer.sprite.size[0];
     }
 
     if (localPlayer.y < 0) {
       localPlayer.y = 0;
-    } else if (localPlayer.y > canvasHeight - localPlayer.sprite.size[1]) {
-      localPlayer.y = canvasHeight - localPlayer.sprite.size[1];
+    } else if (localPlayer.y > Game.height - localPlayer.sprite.size[1]) {
+      localPlayer.y = Game.height - localPlayer.sprite.size[1];
     }
   }
 
@@ -665,7 +702,7 @@
   // Draw everything
   function render() {
     ctx.fillStyle = '#EEEEEE';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, Game.width, Game.height);
 
     // Render the localPlayer if the game isn't over
     if (!isGameOver && (localPlayer.dead === false)) {
@@ -713,7 +750,7 @@
   // Game over
   function localGameOver() {
     isGameOver = true;
-    showAlert('Aww shoot you died!');
+    showAlert('Meh! You died....');
   }
 
   function globalGameOver() {
@@ -727,12 +764,12 @@
 
       successSound.play();
 
-      showAlert('Game over! You scored ' + localScore + ' points and your team scored ' + globalScore + ' points!');
+      showAlert('Game over! You got ' + localScore + ' points and your team scored ' + globalScore + ' points!');
     }, 200);
 
     window.setTimeout(function () {
       $playButton
-        .text('Spela igen!')
+        .text('Play again!')
         .show();
     }, 5000);
   }
@@ -822,9 +859,9 @@
 
   function updateOnlineCount() {
     if (remotePlayers.length) {
-      $online.text((remotePlayers.length + 1) + ' personer spelar just nu'); // remotePlayers + you
+      $online.text((remotePlayers.length + 1) + ' players are online'); // remotePlayers + you
     } else {
-      $online.text('Bara du spelar just nu');
+      $online.text('');
     }
   }
 
@@ -835,9 +872,8 @@
 
 
   $playButton.on('click', function () {
-    // socket.emit('start game');
-    // $playButton.hide();
-    document.location.reload(true);
+    socket.emit('start game');
+    //document.location.reload(true);
   });
 
   $pauseButton.on('click', function () {
@@ -907,6 +943,12 @@
   });
 
 
+  socket.on('players ready', function (data) {
+    showAlert(data.ready + ' players are ready!');
+
+    $playButton.show();
+  });
+
 
   socket.on('move player', function (data) {
     var movePlayer = characterById(data.id, remotePlayers);
@@ -973,13 +1015,12 @@
 
     remotePlayers.splice(remotePlayers.indexOf(deadPlayer), 1);
 
-    showAlert('Player-' + data.id + ' died!');
+    showAlert('Spelare ' + data.id + ' dog :/');
   });
 
 
 
   socket.on('remove player', function (data) {
-    console.log('Player disconnected, removing: ' + data.id);
     var removePlayer = characterById(data.id, remotePlayers);
 
     if (!removePlayer) {

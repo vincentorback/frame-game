@@ -1,4 +1,4 @@
-canvas {
+.Canvas {
   position: absolute;
   top: 0;
   left: 0;
@@ -11,6 +11,6 @@ canvas {
   transition: opacity 300ms ease 300ms;
 }
 
-.is-playing canvas {
+.is-playing .Canvas {
   opacity: 1;
 }
