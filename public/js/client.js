@@ -12,8 +12,8 @@
   // Game size
   var winWidth = window.innerWidth;
   var winHeight = window.innerHeight;
-  var canvasWidth = (winWidth > 800) ? 700 : winWidth;
-  var canvasHeight = (winHeight > 600) ? 500 : winHeight - document.getElementById('footer').offsetHeight;
+  var canvasWidth = winWidth;
+  var canvasHeight = winHeight - document.getElementById('footer').offsetHeight;
 
   // Create the canvas
   var canvas = document.createElement('canvas');
@@ -147,7 +147,6 @@
   and expressing all movements in pixels/second units.
   Movement then becomes x += 50 * dt, or "50 pixels per second".
   */
-  var requestID;
   var lastTime;
   var frameInterval;
   function main() {
@@ -158,11 +157,7 @@
     render();
 
     lastTime = now;
-<<<<<<< HEAD
     frameInterval = window.requestAnimationFrame(main);
-=======
-    requestID = window.requestAnimationFrame(main);
->>>>>>> 0c8ddbbf35d9e472f6cd60729617ca8692594fbb
   }
 
 
@@ -172,10 +167,8 @@
 
     $pauseButton.on('click', function () {
       if ($pauseButton.hasClass('is-active')) {
-        //requestID = window.requestAnimationFrame(main);
         //$pauseButton.removeClass('is-active')
       } else {
-        //window.cancelAnimationFrame(requestID);
         //$pauseButton.addClass('is-active')
       }
     });
@@ -605,9 +598,9 @@
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    reset();
-    lastTime = Date.now();
-    window.cancelAnimationFrame(frameInterval);
+    // reset();
+    // lastTime = Date.now();
+    // window.cancelAnimationFrame(frameInterval);
 
   }, 500));
 

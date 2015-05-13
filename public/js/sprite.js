@@ -54,7 +54,7 @@
 
 
 
-      ctx.drawImage(resources.get(this.url), x, y, this.size[0], this.size[1], 0, 0, this.size[0], this.size[1]);
+      ctx.drawImage(Resources.get(this.url), x, y, this.size[0], this.size[1], 0, 0, this.size[0], this.size[1]);
       // image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight
     }
   };

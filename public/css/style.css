@@ -37,12 +37,12 @@ button {
 }
 
 canvas {
-  position: absolute;
+/*  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   margin: auto;
-  z-index: 0;
+  z-index: 0;*/
 }
 
 
@@ -98,8 +98,8 @@ canvas {
 
 @media (min-width: 600px) {
   .Alert {
-    background: var(--color-green);
-    color: #fff;
+    /*background: var(--color-green);
+    color: #fff;*/
     min-width: 200px;
     top: 15px;
     left: 15px;
