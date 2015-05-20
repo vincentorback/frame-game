@@ -87,7 +87,7 @@ app.use('/', function (req, res) {
 
 
 
-var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+var months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 var players = [];
 var deadPlayers = [];
 var bullets = [];
