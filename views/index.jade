@@ -17,11 +17,11 @@ html(lang='en')
       .Footer-playing
         p.js-playing
       .Footer-score
-        p Poäng:
+        p Points:
           span.js-score  0
       .Footer-info
-        button.Button.js-showDialog Instruktioner &amp; Highscore
-        button.Button.js-pauseButton(style='margin-left:15px') Pausa
+        button.Button.js-showDialog Instructions &amp; Highscore
+        button.Button.js-pauseButton(style='margin-left:15px') Pause
 
 
 
@@ -29,27 +29,27 @@ html(lang='en')
       h1 Game Over!
 
       form.Form(id='highschore-form')
-        input(type='text' placeholder='Skriv in ditt namn!' id='highschore-name')
-        button.Button(type='submit') Skicka
+        input(type='text' placeholder='Write your name!' id='highschore-name')
+        button.Button(type='submit') Submit
 
-      button.Button.js-playButton Spela igen
+      button.Button.js-playButton Play again
 
 
 
     .Dialog.js-dialog(id='dialog' style='display:none')
       .Dialog-info
-        h1 Instruktioner
-        p Akta dig för zombies!!
-        p Använd piltangenterna och skjut med mellanslag!
+        h1 Instructions
+        p Watch out for the zombies!!
+        p Use the keyboard arrows to move around and shoot with the spacebar.
 
       .Dialog-highscores
         h2 Top 10 Highscore
         table(id='highscore-table')
           thead
             tr
-              th Namn
-              th Poäng
-              th Datum
+              th Name
+              th Points
+              th Date
           tbody
           if highscore
             each score in highscore
@@ -58,7 +58,7 @@ html(lang='en')
                 td #{score.score}
                 td #{score.niceDate}
 
-      button.Dialog-close.Button.js-closeDialog Stäng
+      button.Dialog-close.Button.js-closeDialog Close
 
     script(src='/socket.io/socket.io.js')
     script(src='/js/main-min.js')

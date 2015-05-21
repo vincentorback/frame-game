@@ -98,7 +98,7 @@ app.use('/', function (req, res) {
 
 
 
-var months = ['jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+var months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 var users = [];
 
 
@@ -131,7 +131,7 @@ io.sockets.on('connection', function (socket) {
       if ((_.isUndefined(scoreTen)) || (scoreData.score > scoreTen) || (scoreData.score === '0')) {
         highscoreDB.insert({
           score: scoreData.score,
-          name: scoreData.name || 'Anonym',
+          name: scoreData.name || 'Anonymous',
           date: date.getTime(),
           niceDate: niceDate
         });
@@ -140,25 +140,23 @@ io.sockets.on('connection', function (socket) {
           if (err) throw err;
 
           socket.emit('alert', {
-            message: 'Hurra du kom med i highscore!',
+            message: 'Yay you got on the highscore!!',
             openDialog: true,
             highscore: data
           });
         });
 
         socket.broadcast.emit('alert', {
-          message: scoreData.name + ' fick precis ' + scoreData.score + ' poäng!'
+          message: scoreData.name + ' just got ' + scoreData.score + ' points!'
         });
 
       } else {
         socket.emit('alert', {
-          message: 'Ojdå, du kom visst inte med på highscorelistan med dina ' + scoreData.score + ' poäng.... Försök igen!'
+          message: 'Woops, looks like you didn’t make the highscore with your ' + scoreData.score + ' points.... Try again!'
         });
       }
     });
   });
-
-
 
 
 
