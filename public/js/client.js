@@ -12,8 +12,8 @@
   // Game size
   var winWidth = window.innerWidth;
   var winHeight = window.innerHeight;
-  var canvasWidth = winWidth;
-  var canvasHeight = winHeight - document.getElementById('footer').offsetHeight;
+  var canvasWidth = 800; //winWidth;
+  var canvasHeight = 600; //winHeight - document.getElementById('footer').offsetHeight;
 
   // Create the canvas
   var canvas = document.createElement('canvas');
@@ -22,6 +22,8 @@
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   document.body.appendChild(canvas);
+
+  canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
 
 
 
@@ -593,10 +595,12 @@
 
 
   $(window).on('resize', _.debounce(function () {
-    canvasWidth = window.innerWidth;
-    canvasHeight = window.innerHeight - document.getElementById('footer').offsetHeight;
+    canvasWidth = 800; //window.innerWidth;
+    canvasHeight = 600; //window.innerHeight - document.getElementById('footer').offsetHeight;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
+
+    canvas.style.bottom = document.getElementById('footer').offsetHeight + 'px';
 
     // reset();
     // lastTime = Date.now();
