@@ -16,7 +16,6 @@
   canvas.classList.add('Canvas');
 
 
-  // finally query the various pixel ratios
   var devicePixelRatio = window.devicePixelRatio || 1,
     backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
                         ctx.mozBackingStorePixelRatio ||
@@ -224,6 +223,8 @@
     urls: ['../audio/died.wav'],
     volume: 0.1
   });
+
+  Howler.iOSAutoEnable = false;
 
 
 
